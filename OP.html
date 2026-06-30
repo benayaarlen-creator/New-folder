@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container" style="padding-top: 40px;">
+        <a href="index.html" class="back-btn">&larr; Kembali ke Halaman Utasma</a>
+        
+        <header class="detail-header">
+            <h1 class="section-title">WEB Perusahaan</h1>
+        </header>
+        
+        <div class="section-card">
+            <img src="OP.png" alt="WEB Perusahaan" class="detail-img">
+            
+            <h3>Tentang Project</h3>
+            <p>Proyek ini adalah pengembangan sistem chatbot medis dengan domain tertutup (closed-domain) yang dirancang untuk menjawab berbagai pertanyaan terkait penyakit secara otomatis dan interaktif. Sistem ini dibangun menggunakan Rasa Framework dengan fokus utama pada penerapan Natural Language Understanding (NLU) untuk secara akurat mengklasifikasikan maksud (intent) dan mengekstrak entitas (entity) dari kalimat pengguna.</p>
+            <p>Dataset yang digunakan bersumber dari MedQuAD (Medical Question Answering Dataset), yang berisi puluhan ribu pasangan tanya-jawab medis dari situs resmi National Institutes of Health (NIH) Amerika Serikat.</p>
+
+            <h3>Teknologi yang Digunakan</h3>
+            
+            <h4 style="margin-bottom: 10px;">Backend & AI Engine:</h4>
+            <div class="skills-container" style="margin-bottom: 20px;">
+                <span class="skill-badge">Rasa Open Source</span>
+                <span class="skill-badge">Rasa NLU</span>
+                <span class="skill-badge">Rasa Core</span>
+                <span class="skill-badge">Python</span>
+            </div>
+
+            <h4 style="margin-bottom: 10px;">Frontend:</h4>
+            <div class="skills-container" style="margin-bottom: 20px;">
+                <span class="skill-badge">HTML</span>
+                <span class="skill-badge">CSS</span>
+                <span class="skill-badge">JavaScript</span>
+            </div>
+
+            <h3>Peran & Implementasi</h3>
+            <img src="chatbotdata.png" alt="Arsitektur Data" class="detail-img">
+            <p>Detail project:</p>
+            <ul>
+                <li><strong>Dataset:</strong> Merancang skrip Python (convert.py) untuk mengonversi data MedQuAD (XML) ke CSV dan melakukan beberapa ke Rasa (nlu.yml, domain.yml).</li>
+                <li><strong>Membuat Auto-Suggestion:</strong> Mengimplementasikan fitur pencarian <em>fuzzy</em> menggunakan Fuse.js untuk rekomendasi pertanyaan instan.</li>
+                <li><strong>Mengatur Dialog:</strong> Melakukan konfigurasi pada <em>Rules</em> dan <em>Stories</em> untuk alur percakapan yang bervariasi serta penanganan <em>fallback</em> error.</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

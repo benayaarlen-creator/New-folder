@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portofolio | Benaya Arlen</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font modern dari Google -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Navigasi -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">BA.</a>
@@ -18,18 +16,15 @@
                 <li><a href="#about">Tentang</a></li>
                 <li><a href="#skills">Keahlian</a></li>
                 <li><a href="#projects">Portofolio</a></li>
-                <!-- Tombol Mode Gelap/Terang -->
                 <li><button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">🌙</button></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Bagian Hero (Atas) -->
     <header class="hero">
         <div class="hero-content">
             <p class="greeting">Halo, perkenalkan saya</p>
             <h1>Benaya Arlen</h1>
-            <!-- Area animasi mengetik -->
             <h2 class="typing-text">Saya seorang <span id="typewriter"></span><span class="cursor">|</span></h2>
             <a href="#projects" class="btn-primary">Lihat Pekerjaan Saya</a>
         </div>
@@ -37,13 +32,11 @@
 
     <div class="container">
         
-        <!-- Bagian Tentang Saya -->
         <section id="about" class="section-card fade-in">
             <h3 class="section-title">Tentang Saya</h3>
             <p>Saya memiliki minat mendalam dalam memecahkan masalah kompleks melalui teknologi. Saat ini, saya fokus mengejar peluang <strong>IT Internship</strong> untuk berkontribusi di lingkungan korporat, khususnya industri perbankan yang menuntut presisi dan keandalan data. Saya terbiasa menganalisis data, membangun model cerdas, dan merancangnya menjadi solusi yang aplikatif.</p>
         </section>
 
-        <!-- Bagian Keahlian -->
         <section id="skills" class="section-card fade-in">
             <h3 class="section-title">Keahlian Teknis</h3>
             <div class="skills-container">
@@ -55,26 +48,52 @@
             </div>
         </section>
 
-        <!-- Bagian Project -->
         <section id="projects" class="fade-in">
             <h3 class="section-title text-center">Project Unggulan</h3>
             <div class="projects-grid">
                 
-                <div class="project-card">
-                    <h4>Riset Artificial Intelligence</h4>
-                    <p>Membangun model AI menggunakan Python untuk memproses data dan menghasilkan ringkasan prediksi secara otomatis guna mempercepat pengambilan keputusan.</p>
-                    <div class="project-tags">
-                        <span>Python</span><span>AI</span>
+                <a href="chatbot.html" class="card-link-wrapper">
+                    <div class="project-card">
+                        <img src="rasa.png" alt="Medical Chatbot" class="project-img">
+                        <h4>Medical Chatbot</h4>
+                        <p>Pengembangan chatbot medis berbasis Artificial Intelligence untuk mendeteksi gejala awal pasien dan memberikan rekomendasi kesehatan.</p>
+                        <div class="project-tags">
+                            <span>Python</span><span>RASA NLU</span><span>Medical Tech</span>
+                        </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="project-card">
-                    <h4>Website Portofolio Responsif</h4>
-                    <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern, serta melakukan integrasi CI/CD melalui GitHub Pages.</p>
-                    <div class="project-tags">
-                        <span>HTML</span><span>CSS</span>
+                <a href="OP.html" class="card-link-wrapper">
+                    <div class="project-card">
+                        <img src="OPlogo.png" alt="WEB Onda Printing" class="project-img">
+                        <h4>WEB Perusahaan Onda Printing</h4>
+                        <p>Pengembangan chatbot medis berbasis Artificial Intelligence untuk mendeteksi gejala awal pasien dan memberikan rekomendasi kesehatan.</p>
+                        <div class="project-tags">
+                            <span>Python</span><span>RASA NLU</span><span>Medical Tech</span>
+                        </div>
                     </div>
-                </div>
+                </a>
+
+                <a href="https://github.com/benayaarlen-creator/New-folder" target="_blank" class="card-link-wrapper">
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ilustrasi Web" class="project-img">
+                        <h4>Website Portofolio Responsif</h4>
+                        <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern. Dilengkapi fitur Dark Mode.</p>
+                        <div class="project-tags">
+                            <span>HTML</span><span>CSS</span><span>GitHub</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://github.com/benayaarlen-creator/New-folder" target="_blank" class="card-link-wrapper">
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ilustrasi Web" class="project-img">
+                        <h4>Website Portofolio Responsif</h4>
+                        <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern. Dilengkapi fitur Dark Mode.</p>
+                        <div class="project-tags">
+                            <span>HTML</span><span>CSS</span><span>GitHub</span>
+                        </div>
+                    </div>
+                </a>
 
             </div>
         </section>
@@ -85,7 +104,6 @@
         <p>&copy; 2026 Benaya Arlen. Dideploy melalui GitHub Pages.</p>
     </footer>
 
-    <!-- Kumpulan Script -->
     <script>
         // 1. Script Animasi Mengetik
         const words = ["Tech Enthusiast.", "Problem Solver.", "IT Intern Candidate."];
