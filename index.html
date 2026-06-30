@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portofolio | Benaya Arlen</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font modern dari Google -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
+    <!-- Navigasi -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">BA.</a>
@@ -16,14 +18,18 @@
                 <li><a href="#about">Tentang</a></li>
                 <li><a href="#skills">Keahlian</a></li>
                 <li><a href="#projects">Portofolio</a></li>
+                <!-- Tombol Mode Gelap/Terang -->
+                <li><button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">🌙</button></li>
             </ul>
         </div>
     </nav>
 
+    <!-- Bagian Hero (Atas) -->
     <header class="hero">
         <div class="hero-content">
             <p class="greeting">Halo, perkenalkan saya</p>
             <h1>Benaya Arlen</h1>
+            <!-- Area animasi mengetik -->
             <h2 class="typing-text">Saya seorang <span id="typewriter"></span><span class="cursor">|</span></h2>
             <a href="#projects" class="btn-primary">Lihat Pekerjaan Saya</a>
         </div>
@@ -31,11 +37,13 @@
 
     <div class="container">
         
+        <!-- Bagian Tentang Saya -->
         <section id="about" class="section-card fade-in">
             <h3 class="section-title">Tentang Saya</h3>
             <p>Saya memiliki minat mendalam dalam memecahkan masalah kompleks melalui teknologi. Saat ini, saya fokus mengejar peluang <strong>IT Internship</strong> untuk berkontribusi di lingkungan korporat, khususnya industri perbankan yang menuntut presisi dan keandalan data. Saya terbiasa menganalisis data, membangun model cerdas, dan merancangnya menjadi solusi yang aplikatif.</p>
         </section>
 
+        <!-- Bagian Keahlian -->
         <section id="skills" class="section-card fade-in">
             <h3 class="section-title">Keahlian Teknis</h3>
             <div class="skills-container">
@@ -47,6 +55,7 @@
             </div>
         </section>
 
+        <!-- Bagian Project -->
         <section id="projects" class="fade-in">
             <h3 class="section-title text-center">Project Unggulan</h3>
             <div class="projects-grid">
@@ -76,7 +85,9 @@
         <p>&copy; 2026 Benaya Arlen. Dideploy melalui GitHub Pages.</p>
     </footer>
 
+    <!-- Kumpulan Script -->
     <script>
+        // 1. Script Animasi Mengetik
         const words = ["Tech Enthusiast.", "Problem Solver.", "IT Intern Candidate."];
         let i = 0, timer;
         function typingEffect() {
@@ -108,6 +119,29 @@
             loopDeleting();
         }
         typingEffect();
+
+        // 2. Script Dark Mode Toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        // Cek apakah sebelumnya user sudah memilih dark mode
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-theme');
+            themeToggleBtn.textContent = '☀️';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            
+            // Simpan preferensi & ubah ikon
+            if (body.classList.contains('dark-theme')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.textContent = '🌙';
+            }
+        });
     </script>
 </body>
 </html>
