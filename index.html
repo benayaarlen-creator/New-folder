@@ -1,11 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Portofolio Saya</title>
+    
+    <!-- Bagian CSS untuk mempercantik tampilan -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        .container {
+            max-width: 800px;
+            margin: -30px auto 2rem auto;
+            padding: 0 20px;
+        }
+        section {
+            background: white;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #2980b9;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .skills-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .skills-list li {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.9rem;
+        }
+        .project-item {
+            margin-bottom: 15px;
+        }
+        .project-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+    </style>
 </head>
 <body>
-    
+
+    <!-- Bagian Kepala (Header) -->
+    <header>
+        <h1>Benaya Arlen</h1>
+        <p>Aspiring IT Intern | Tech Enthusiast</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Bagian Tentang Saya -->
+        <section id="about">
+            <h2>Tentang Saya</h2>
+            <p>Halo! Saya adalah seseorang yang memiliki ketertarikan besar dalam memecahkan masalah melalui teknologi. Saat ini saya sedang mencari peluang <strong>IT Internship</strong> untuk mengaplikasikan ilmu yang saya miliki, khususnya di lingkungan korporat atau institusi perbankan. Saya sangat antusias untuk belajar hal baru dan berkontribusi dalam tim.</p>
+        </section>
+
+        <!-- Bagian Keahlian -->
+        <section id="skills">
+            <h2>Keahlian Utama</h2>
+            <ul class="skills-list">
+                <li>Python (AI & Data)</li>
+                <li>HTML5</li>
+                <li>CSS3</li>
+                <li>Git & GitHub</li>
+                <li>Problem Solving</li>
+            </ul>
+        </section>
+
+        <!-- Bagian Project -->
+        <section id="projects">
+            <h2>Project Portofolio</h2>
+            
+            <div class="project-item">
+                <span class="project-title">1. Riset Artificial Intelligence</span>
+                <p>Pengembangan model AI menggunakan bahasa pemrograman Python untuk melakukan prediksi dan merangkum kesimpulan data secara otomatis.</p>
+            </div>
+
+            <div class="project-item">
+                <span class="project-title">2. Website Portofolio Interaktif</span>
+                <p>Website portofolio yang sedang Anda lihat ini. Dibangun dari awal menggunakan struktur HTML dan tata letak CSS, serta diintegrasikan dengan GitHub Pages untuk keperluan deployment.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Bagian Bawah (Footer) -->
+    <footer>
+        <p>&copy; 2026 Benaya Arlen. Dibuat dengan Visual Studio Code & GitHub.</p>
+    </footer>
+
 </body>
 </html>
