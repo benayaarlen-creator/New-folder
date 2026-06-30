@@ -3,125 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portofolio Saya</title>
-    
-    <!-- Bagian CSS untuk mempercantik tampilan -->
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
-            color: #333;
-        }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 3rem 0;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        .container {
-            max-width: 800px;
-            margin: -30px auto 2rem auto;
-            padding: 0 20px;
-        }
-        section {
-            background: white;
-            padding: 25px 30px;
-            margin-bottom: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        h2 {
-            color: #2980b9;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-        }
-        .skills-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .skills-list li {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 20px;
-            margin: 5px 5px 5px 0;
-            font-size: 0.9rem;
-        }
-        .project-item {
-            margin-bottom: 15px;
-        }
-        .project-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-    </style>
+    <title>Portofolio | Benaya Arlen</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Bagian Kepala (Header) -->
-    <header>
-        <h1>Benaya Arlen</h1>
-        <p>Aspiring IT Intern | Tech Enthusiast</p>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">BA.</a>
+            <ul class="nav-links">
+                <li><a href="#about">Tentang</a></li>
+                <li><a href="#skills">Keahlian</a></li>
+                <li><a href="#projects">Portofolio</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <p class="greeting">Halo, perkenalkan saya</p>
+            <h1>Benaya Arlen</h1>
+            <h2 class="typing-text">Saya seorang <span id="typewriter"></span><span class="cursor">|</span></h2>
+            <a href="#projects" class="btn-primary">Lihat Pekerjaan Saya</a>
+        </div>
     </header>
 
     <div class="container">
         
-        <!-- Bagian Tentang Saya -->
-        <section id="about">
-            <h2>Tentang Saya</h2>
-            <p>Halo! Saya adalah seseorang yang memiliki ketertarikan besar dalam memecahkan masalah melalui teknologi. Saat ini saya sedang mencari peluang <strong>IT Internship</strong> untuk mengaplikasikan ilmu yang saya miliki, khususnya di lingkungan korporat atau institusi perbankan. Saya sangat antusias untuk belajar hal baru dan berkontribusi dalam tim.</p>
+        <section id="about" class="section-card fade-in">
+            <h3 class="section-title">Tentang Saya</h3>
+            <p>Saya memiliki minat mendalam dalam memecahkan masalah kompleks melalui teknologi. Saat ini, saya fokus mengejar peluang <strong>IT Internship</strong> untuk berkontribusi di lingkungan korporat, khususnya industri perbankan yang menuntut presisi dan keandalan data. Saya terbiasa menganalisis data, membangun model cerdas, dan merancangnya menjadi solusi yang aplikatif.</p>
         </section>
 
-        <!-- Bagian Keahlian -->
-        <section id="skills">
-            <h2>Keahlian Utama</h2>
-            <ul class="skills-list">
-                <li>Python (AI & Data)</li>
-                <li>HTML5</li>
-                <li>CSS3</li>
-                <li>Git & GitHub</li>
-                <li>Problem Solving</li>
-            </ul>
-        </section>
-
-        <!-- Bagian Project -->
-        <section id="projects">
-            <h2>Project Portofolio</h2>
-            
-            <div class="project-item">
-                <span class="project-title">1. Riset Artificial Intelligence</span>
-                <p>Pengembangan model AI menggunakan bahasa pemrograman Python untuk melakukan prediksi dan merangkum kesimpulan data secara otomatis.</p>
+        <section id="skills" class="section-card fade-in">
+            <h3 class="section-title">Keahlian Teknis</h3>
+            <div class="skills-container">
+                <span class="skill-badge python">Python (AI & Data)</span>
+                <span class="skill-badge web">HTML5 & CSS3</span>
+                <span class="skill-badge git">Git & Version Control</span>
+                <span class="skill-badge logic">Problem Solving</span>
+                <span class="skill-badge logic">Data Analysis</span>
             </div>
+        </section>
 
-            <div class="project-item">
-                <span class="project-title">2. Website Portofolio Interaktif</span>
-                <p>Website portofolio yang sedang Anda lihat ini. Dibangun dari awal menggunakan struktur HTML dan tata letak CSS, serta diintegrasikan dengan GitHub Pages untuk keperluan deployment.</p>
+        <section id="projects" class="fade-in">
+            <h3 class="section-title text-center">Project Unggulan</h3>
+            <div class="projects-grid">
+                
+                <div class="project-card">
+                    <h4>Riset Artificial Intelligence</h4>
+                    <p>Membangun model AI menggunakan Python untuk memproses data dan menghasilkan ringkasan prediksi secara otomatis guna mempercepat pengambilan keputusan.</p>
+                    <div class="project-tags">
+                        <span>Python</span><span>AI</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h4>Website Portofolio Responsif</h4>
+                    <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern, serta melakukan integrasi CI/CD melalui GitHub Pages.</p>
+                    <div class="project-tags">
+                        <span>HTML</span><span>CSS</span>
+                    </div>
+                </div>
+
             </div>
         </section>
 
     </div>
 
-    <!-- Bagian Bawah (Footer) -->
     <footer>
-        <p>&copy; 2026 Benaya Arlen. Dibuat dengan Visual Studio Code & GitHub.</p>
+        <p>&copy; 2026 Benaya Arlen. Dideploy melalui GitHub Pages.</p>
     </footer>
 
+    <script>
+        const words = ["Tech Enthusiast.", "Problem Solver.", "IT Intern Candidate."];
+        let i = 0, timer;
+        function typingEffect() {
+            let word = words[i].split("");
+            var loopTyping = function() {
+                if (word.length > 0) {
+                    document.getElementById('typewriter').innerHTML += word.shift();
+                } else {
+                    setTimeout(deletingEffect, 2000);
+                    return false;
+                };
+                timer = setTimeout(loopTyping, 100);
+            };
+            loopTyping();
+        }
+        function deletingEffect() {
+            let word = words[i].split("");
+            var loopDeleting = function() {
+                if (word.length > 0) {
+                    word.pop();
+                    document.getElementById('typewriter').innerHTML = word.join("");
+                } else {
+                    if (words.length > (i + 1)) { i++; } else { i = 0; };
+                    typingEffect();
+                    return false;
+                };
+                timer = setTimeout(loopDeleting, 50);
+            };
+            loopDeleting();
+        }
+        typingEffect();
+    </script>
 </body>
 </html>
