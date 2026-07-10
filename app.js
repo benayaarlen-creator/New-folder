@@ -818,9 +818,42 @@ function animate(now) {
 
   world.scale.setScalar(visualScale);
 
-  mainGlobe.visible =
-    weights.universe < 0.98 &&
-    weights.dataSpace < 0.98;
+  /*
+    Jangan menyembunyikan mainGlobe karena semua mini-globe node
+    merupakan anak dari group tersebut. Menyembunyikan induknya akan
+    membuat seluruh node hilang dan layar terlihat hitam.
+
+    Sebagai gantinya, hanya intensitas globe utama yang diredupkan.
+  */
+  mainGlobe.visible = true;
+
+  const globeBodyOpacity =
+    0.82 *
+    THREE.MathUtils.clamp(
+      1 - weights.universe * 0.78 - weights.dataSpace * 0.88,
+      0.08,
+      1
+    );
+
+  mainPointGlobe.material.opacity = globeBodyOpacity;
+
+  mainGlow.material.opacity =
+    0.025 *
+    THREE.MathUtils.clamp(
+      1 - weights.universe * 0.75 - weights.dataSpace * 0.9,
+      0.05,
+      1
+    );
+
+  mainOrbits.forEach((orbit, index) => {
+    orbit.material.opacity =
+      (0.13 - index * 0.02) *
+      THREE.MathUtils.clamp(
+        1 - weights.dataSpace * 0.72,
+        0.2,
+        1
+      );
+  });
 
   nodes.forEach((node, index) => {
     const universeAngle =
@@ -858,19 +891,32 @@ function animate(now) {
     node.miniGlobe.userData.orbit.rotation.z +=
       0.006 + index * 0.0005;
 
-    const depthScale =
-      weights.dataSpace > 0.4
-        ? 1.15
-        : 1;
+    /*
+      Universe mode:
+      mini-globe tetap terlihat dengan ukuran sedikit lebih besar.
+
+      Data Space mode:
+      mini-globe disusun rapi dan dibuat cukup besar agar mudah dibaca.
+    */
+    const modeScale =
+      1 +
+      weights.universe * 0.24 +
+      weights.dataSpace * 0.48;
 
     node.miniGlobe.scale.setScalar(
       (node.data.importance || 1) *
-        depthScale
+      modeScale
     );
 
+    /*
+      Mini-globe selalu menghadap kamera agar ikon di tengah tetap terbaca,
+      tetapi point sphere dan orbit internalnya tetap berotasi sendiri.
+    */
     node.miniGlobe.quaternion.copy(
       camera.quaternion
     );
+
+    node.miniGlobe.visible = true;
   });
 
   mainOrbits.forEach((orbit, index) => {
