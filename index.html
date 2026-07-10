@@ -906,8 +906,11 @@
     */
     let rotationX = 0;
     let rotationY = 0;
+    let rotationZ = 0;
+
     let targetRotationX = 0;
     let targetRotationY = 0;
+    let targetRotationZ = 0;
 
     let globeScale = 1;
     let targetGlobeScale = 1;
@@ -1576,9 +1579,20 @@
         : 1 - Math.pow(-2 * value + 2, 3) / 2;
     }
 
+    function shortestAngleDifference(from, to) {
+      return Math.atan2(
+        Math.sin(to - from),
+        Math.cos(to - from)
+      );
+    }
+
     /*
-      Menghitung rotasi globe agar node menghadap ke kamera.
-      Kamera dan posisi worldGroup tidak berubah.
+      Memutar globe agar node terpilih tepat menghadap kamera.
+
+      Penting:
+      Globe berada di kanan layar pada desktop. Oleh karena itu target
+      tidak boleh selalu (0, 0, 1). Target harus dihitung dari pusat globe
+      menuju posisi kamera.
     */
     function focusNode(nodeId, openAfterFocus = true) {
       const entry = nodeObjects.find(({ data }) => data.id === nodeId);
@@ -1589,31 +1603,80 @@
 
       autoRotateEnabled = false;
 
-      const localPosition = entry.anchor.position.clone().normalize();
+      worldGroup.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
 
-      const desiredY = Math.atan2(localPosition.x, localPosition.z);
-      const horizontalLength = Math.hypot(
-        localPosition.x,
-        localPosition.z
+      const globeCenterWorld = new THREE.Vector3();
+      worldGroup.getWorldPosition(globeCenterWorld);
+
+      const nodeWorldPosition = new THREE.Vector3();
+      entry.anchor.getWorldPosition(nodeWorldPosition);
+
+      const currentNodeDirection = nodeWorldPosition
+        .clone()
+        .sub(globeCenterWorld)
+        .normalize();
+
+      const targetCameraDirection = camera.position
+        .clone()
+        .sub(globeCenterWorld)
+        .normalize();
+
+      /*
+        Quaternion delta membawa arah node saat ini menuju arah kamera.
+        Karena worldGroup tetap pada posisi yang sama, globe tidak berpindah.
+      */
+      const deltaQuaternion = new THREE.Quaternion().setFromUnitVectors(
+        currentNodeDirection,
+        targetCameraDirection
       );
-      const desiredX = -Math.atan2(
-        localPosition.y,
-        horizontalLength
+
+      const startQuaternion = worldGroup.quaternion.clone();
+      const endQuaternion = deltaQuaternion
+        .multiply(startQuaternion)
+        .normalize();
+
+      const startEuler = new THREE.Euler().setFromQuaternion(
+        startQuaternion,
+        "XYZ"
+      );
+
+      const endEuler = new THREE.Euler().setFromQuaternion(
+        endQuaternion,
+        "XYZ"
+      );
+
+      const deltaX = shortestAngleDifference(
+        startEuler.x,
+        endEuler.x
+      );
+      const deltaY = shortestAngleDifference(
+        startEuler.y,
+        endEuler.y
+      );
+      const deltaZ = shortestAngleDifference(
+        startEuler.z,
+        endEuler.z
       );
 
       focusAnimation = {
-        startX: rotationX,
-        startY: rotationY,
-        endX: desiredX,
-        endY: desiredY,
+        startX: startEuler.x,
+        startY: startEuler.y,
+        startZ: startEuler.z,
+
+        endX: startEuler.x + deltaX,
+        endY: startEuler.y + deltaY,
+        endZ: startEuler.z + deltaZ,
+
         startTime: performance.now(),
-        duration: reduceMotion ? 1 : 1000,
+        duration: reduceMotion ? 1 : 1050,
         data: entry.data,
         openAfterFocus
       };
 
-      targetRotationX = desiredX;
-      targetRotationY = desiredY;
+      targetRotationX = focusAnimation.endX;
+      targetRotationY = focusAnimation.endY;
+      targetRotationZ = focusAnimation.endZ;
     }
 
     function updateFocusAnimation(now) {
@@ -1640,10 +1703,20 @@
         eased
       );
 
+      rotationZ = THREE.MathUtils.lerp(
+        focusAnimation.startZ,
+        focusAnimation.endZ,
+        eased
+      );
+
       globeScale += (targetGlobeScale - globeScale) * 0.09;
 
-      worldGroup.rotation.x = rotationX;
-      worldGroup.rotation.y = rotationY;
+      worldGroup.rotation.set(
+        rotationX,
+        rotationY,
+        rotationZ,
+        "XYZ"
+      );
       worldGroup.scale.setScalar(globeScale);
 
       if (progress >= 1) {
@@ -1652,6 +1725,7 @@
 
         targetRotationX = rotationX;
         targetRotationY = rotationY;
+        targetRotationZ = rotationZ;
 
         if (completed.openAfterFocus) {
           window.setTimeout(() => {
@@ -1693,6 +1767,7 @@
 
       targetRotationX = 0;
       targetRotationY = 0;
+      targetRotationZ = 0;
       targetGlobeScale = 1;
     });
 
@@ -1773,10 +1848,15 @@
 
         rotationX += (targetRotationX - rotationX) * 0.085;
         rotationY += (targetRotationY - rotationY) * 0.085;
+        rotationZ += (targetRotationZ - rotationZ) * 0.085;
         globeScale += (targetGlobeScale - globeScale) * 0.09;
 
-        worldGroup.rotation.x = rotationX;
-        worldGroup.rotation.y = rotationY;
+        worldGroup.rotation.set(
+          rotationX,
+          rotationY,
+          rotationZ,
+          "XYZ"
+        );
         worldGroup.scale.setScalar(globeScale);
       }
 
