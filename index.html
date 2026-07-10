@@ -1,238 +1,2610 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portofolio | Benaya Arlen</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#02060d" />
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">BA.</a>
-            <ul class="nav-links">
-                <li><a href="#about">Tentang</a></li>
-                <li><a href="#skills">Keahlian</a></li>
-                <li><a href="#projects">Portofolio</a></li>
-                <li><button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">🌙</button></li>
-            </ul>
-        </div>
+  <title>Benaya Arlen | Holographic Portfolio</title>
+  <meta
+    name="description"
+    content="Portofolio holografik Benaya Arlen, menampilkan proyek web, AI, dan pengembangan perangkat lunak."
+  />
+
+  <!--
+    VERSI EKSPERIMEN:
+    Semua CSS dan JavaScript masih ditaruh di index.html agar mudah diuji.
+    Setelah desainnya cocok, CSS akan dipindahkan ke style.css
+    dan JavaScript ke script.js.
+  -->
+
+  <style>
+    /* =========================================================
+       1. VARIABEL DASAR
+       ========================================================= */
+    :root {
+      --bg: #02060d;
+      --bg-soft: #07111d;
+      --cyan: #54f6ff;
+      --cyan-strong: #00d9ff;
+      --blue: #3d7dff;
+      --white: #eaffff;
+      --muted: #8eb4c0;
+      --panel: rgba(4, 25, 37, 0.54);
+      --line: rgba(84, 246, 255, 0.42);
+      --line-soft: rgba(84, 246, 255, 0.14);
+      --danger: #ff9d4d;
+      --shadow:
+        0 0 10px rgba(84, 246, 255, 0.25),
+        0 0 30px rgba(0, 217, 255, 0.12);
+      --radius: 22px;
+      --header-height: 76px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: hidden;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 50% 26%, rgba(0, 217, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 10% 80%, rgba(61, 125, 255, 0.09), transparent 25%),
+        linear-gradient(180deg, #01030a 0%, #020914 50%, #01030a 100%);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image:
+        linear-gradient(rgba(84, 246, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(84, 246, 255, 0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0.12;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 3px,
+          rgba(84, 246, 255, 0.12) 4px
+        );
+      mix-blend-mode: screen;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================================================
+       2. LATAR BINTANG
+       ========================================================= */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      left: 50%;
+      top: 40%;
+      z-index: -2;
+      width: min(72vw, 760px);
+      aspect-ratio: 1;
+      pointer-events: none;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(
+          circle,
+          rgba(84, 246, 255, 0.1) 0%,
+          rgba(0, 217, 255, 0.04) 35%,
+          transparent 68%
+        );
+      filter: blur(18px);
+    }
+
+    /* =========================================================
+       3. NAVIGASI
+       ========================================================= */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: var(--header-height);
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        10px
+        max(18px, env(safe-area-inset-left));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid rgba(84, 246, 255, 0.12);
+      background: linear-gradient(
+        to bottom,
+        rgba(2, 6, 13, 0.92),
+        rgba(2, 6, 13, 0.55)
+      );
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      min-width: max-content;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.19em;
+      text-transform: uppercase;
+    }
+
+    .brand-core {
+      position: relative;
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      color: var(--white);
+      box-shadow:
+        inset 0 0 13px rgba(84, 246, 255, 0.42),
+        0 0 17px rgba(84, 246, 255, 0.45);
+    }
+
+    .brand-core::before,
+    .brand-core::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border: 1px dashed rgba(84, 246, 255, 0.35);
+      border-radius: 50%;
+      animation: spin 10s linear infinite;
+    }
+
+    .brand-core::after {
+      inset: 5px;
+      border-style: solid;
+      animation-direction: reverse;
+      animation-duration: 5s;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(13px, 2.5vw, 28px);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-links a {
+      position: relative;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 180ms ease, text-shadow 180ms ease;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: -7px;
+      height: 1px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      transition: right 180ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--white);
+      text-shadow: 0 0 9px var(--cyan);
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a:focus-visible::after {
+      right: 0;
+    }
+
+    .hud-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5dffb0;
+      box-shadow: 0 0 10px #5dffb0;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* =========================================================
+       4. HERO
+       ========================================================= */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      padding:
+        calc(var(--header-height) + 30px)
+        clamp(18px, 5vw, 72px)
+        40px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      width: min(1240px, 100%);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(420px, 1.25fr);
+      align-items: center;
+      gap: clamp(28px, 5vw, 72px);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 4;
+      max-width: 650px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--cyan);
+      font-size: clamp(0.7rem, 1.3vw, 0.82rem);
+      font-weight: 800;
+      letter-spacing: 0.23em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 42px;
+      height: 1px;
+      background: var(--cyan);
+      box-shadow: 0 0 9px var(--cyan);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: -0.055em;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow:
+        0 0 6px rgba(234, 255, 255, 0.65),
+        0 0 18px rgba(84, 246, 255, 0.35),
+        0 0 45px rgba(0, 217, 255, 0.16);
+    }
+
+    .hero h1 span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(84, 246, 255, 0.78);
+      text-shadow:
+        0 0 8px rgba(84, 246, 255, 0.5),
+        0 0 28px rgba(0, 217, 255, 0.24);
+    }
+
+    .role-line {
+      min-height: 36px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      letter-spacing: 0.04em;
+    }
+
+    #typewriter {
+      color: var(--cyan);
+      font-weight: 800;
+      text-shadow: 0 0 10px rgba(84, 246, 255, 0.55);
+    }
+
+    .cursor {
+      color: var(--cyan);
+      animation: blink 0.8s steps(1) infinite;
+    }
+
+    .hero-description {
+      max-width: 600px;
+      margin: 20px 0 0;
+      color: #a8c4cc;
+      font-size: clamp(0.94rem, 1.5vw, 1.05rem);
+      line-height: 1.82;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 31px;
+    }
+
+    .hud-button {
+      position: relative;
+      min-height: 48px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      overflow: hidden;
+      border: 1px solid rgba(84, 246, 255, 0.58);
+      border-radius: 4px;
+      color: var(--white);
+      background: rgba(0, 217, 255, 0.08);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow:
+        inset 0 0 20px rgba(84, 246, 255, 0.06),
+        0 0 16px rgba(84, 246, 255, 0.12);
+      transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease;
+    }
+
+    .hud-button::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-110%);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(84, 246, 255, 0.22),
+        transparent
+      );
+      transition: transform 420ms ease;
+    }
+
+    .hud-button:hover,
+    .hud-button:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      background: rgba(0, 217, 255, 0.14);
+    }
+
+    .hud-button:hover::before,
+    .hud-button:focus-visible::before {
+      transform: translateX(110%);
+    }
+
+    .hud-button.secondary {
+      color: var(--muted);
+      border-color: rgba(142, 180, 192, 0.28);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .system-readout {
+      margin-top: 36px;
+      padding: 13px 0 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 13px;
+      border-top: 1px solid rgba(84, 246, 255, 0.14);
+    }
+
+    .readout-item {
+      min-width: 0;
+    }
+
+    .readout-label {
+      display: block;
+      color: #5e8794;
+      font-size: 0.61rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .readout-value {
+      display: block;
+      margin-top: 4px;
+      color: var(--cyan);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    /* =========================================================
+       5. HOLOGRAM GLOBE
+       ========================================================= */
+    .globe-column {
+      position: relative;
+      min-height: min(720px, 74svh);
+      display: grid;
+      place-items: center;
+      perspective: 1100px;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .globe-shell {
+      position: relative;
+      width: min(560px, 82vw);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      transform-style: preserve-3d;
+      transition: transform 100ms linear;
+    }
+
+    .globe-shell::before {
+      content: "";
+      position: absolute;
+      inset: 5%;
+      border: 1px solid rgba(84, 246, 255, 0.34);
+      border-radius: 50%;
+      box-shadow:
+        inset 0 0 55px rgba(0, 217, 255, 0.12),
+        0 0 45px rgba(0, 217, 255, 0.11);
+    }
+
+    .globe-shell::after {
+      content: "";
+      position: absolute;
+      inset: 15%;
+      border: 1px dashed rgba(84, 246, 255, 0.19);
+      border-radius: 50%;
+      animation: spin 23s linear infinite reverse;
+    }
+
+    .orbit {
+      position: absolute;
+      width: 94%;
+      height: 38%;
+      border: 1px solid rgba(84, 246, 255, 0.27);
+      border-radius: 50%;
+      box-shadow: 0 0 16px rgba(84, 246, 255, 0.1);
+      transform-style: preserve-3d;
+      pointer-events: none;
+    }
+
+    .orbit.one {
+      transform: rotateX(73deg) rotateZ(10deg);
+      animation: orbitDrift 14s linear infinite;
+    }
+
+    .orbit.two {
+      width: 80%;
+      transform: rotateX(74deg) rotateZ(70deg);
+      animation: orbitDrift 18s linear infinite reverse;
+    }
+
+    .orbit.three {
+      width: 69%;
+      transform: rotateY(78deg) rotateZ(18deg);
+      animation: orbitDriftVertical 21s linear infinite;
+    }
+
+    .globe-grid {
+      position: absolute;
+      inset: 9%;
+      overflow: hidden;
+      border: 1px solid rgba(84, 246, 255, 0.28);
+      border-radius: 50%;
+      opacity: 0.78;
+      background:
+        repeating-radial-gradient(
+          ellipse at center,
+          transparent 0 21px,
+          rgba(84, 246, 255, 0.12) 22px 23px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 34px,
+          rgba(84, 246, 255, 0.12) 35px 36px
+        );
+      mask-image: radial-gradient(circle, black 0 68%, transparent 71%);
+      animation: gridPulse 3.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .arc-core {
+      position: absolute;
+      width: 31%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      background:
+        radial-gradient(
+          circle,
+          rgba(234, 255, 255, 0.96) 0 4%,
+          rgba(84, 246, 255, 0.8) 5% 13%,
+          rgba(0, 217, 255, 0.17) 14% 43%,
+          transparent 45%
+        );
+      box-shadow:
+        inset 0 0 30px rgba(84, 246, 255, 0.72),
+        0 0 25px rgba(84, 246, 255, 0.72),
+        0 0 80px rgba(0, 217, 255, 0.32);
+      animation: corePulse 2.3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .arc-core::before,
+    .arc-core::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .arc-core::before {
+      inset: -17%;
+      border: 2px dashed rgba(84, 246, 255, 0.6);
+      animation: spin 11s linear infinite;
+    }
+
+    .arc-core::after {
+      inset: 16%;
+      border: 4px double rgba(234, 255, 255, 0.72);
+      animation: spin 6s linear infinite reverse;
+    }
+
+    .core-label {
+      position: relative;
+      z-index: 2;
+      color: var(--white);
+      font-size: clamp(0.56rem, 1.1vw, 0.75rem);
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px var(--cyan);
+    }
+
+    .globe-items {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+
+    .globe-card {
+      --card-x: 0px;
+      --card-y: 0px;
+      --card-z: 0px;
+      --card-rotate: 0deg;
+
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: clamp(118px, 13vw, 154px);
+      min-height: 80px;
+      padding: 12px;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      border: 1px solid rgba(84, 246, 255, 0.47);
+      border-radius: 10px;
+      color: var(--white);
+      background:
+        linear-gradient(135deg, rgba(84, 246, 255, 0.1), transparent 55%),
+        rgba(2, 14, 24, 0.73);
+      box-shadow:
+        inset 0 0 19px rgba(84, 246, 255, 0.06),
+        0 0 16px rgba(84, 246, 255, 0.12);
+      backdrop-filter: blur(9px);
+      transform-style: preserve-3d;
+      transform:
+        translate(-50%, -50%)
+        translate3d(var(--card-x), var(--card-y), var(--card-z))
+        rotateZ(var(--card-rotate));
+      cursor: pointer;
+      transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background 180ms ease,
+        filter 180ms ease;
+    }
+
+    .globe-card::before,
+    .globe-card::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+    }
+
+    .globe-card::before {
+      left: -1px;
+      top: -1px;
+      border-left: 2px solid var(--cyan);
+      border-top: 2px solid var(--cyan);
+    }
+
+    .globe-card::after {
+      right: -1px;
+      bottom: -1px;
+      border-right: 2px solid var(--cyan);
+      border-bottom: 2px solid var(--cyan);
+    }
+
+    .globe-card:hover,
+    .globe-card:focus-visible {
+      z-index: 10;
+      border-color: var(--cyan);
+      outline: none;
+      background:
+        linear-gradient(135deg, rgba(84, 246, 255, 0.17), transparent 60%),
+        rgba(2, 20, 31, 0.87);
+      box-shadow:
+        inset 0 0 22px rgba(84, 246, 255, 0.1),
+        0 0 18px rgba(84, 246, 255, 0.4),
+        0 0 45px rgba(0, 217, 255, 0.15);
+    }
+
+    .globe-card small {
+      color: var(--cyan);
+      font-size: 0.54rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .globe-card strong {
+      font-size: clamp(0.72rem, 1.2vw, 0.9rem);
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+    }
+
+    .globe-card span {
+      color: var(--muted);
+      font-size: 0.59rem;
+      line-height: 1.35;
+    }
+
+    .globe-card[data-position="top"] {
+      --card-x: 0px;
+      --card-y: -225px;
+      --card-z: 26px;
+    }
+
+    .globe-card[data-position="top-right"] {
+      --card-x: 190px;
+      --card-y: -126px;
+      --card-z: 80px;
+      --card-rotate: 4deg;
+    }
+
+    .globe-card[data-position="right"] {
+      --card-x: 242px;
+      --card-y: 54px;
+      --card-z: -10px;
+      --card-rotate: 7deg;
+    }
+
+    .globe-card[data-position="bottom-right"] {
+      --card-x: 145px;
+      --card-y: 205px;
+      --card-z: 42px;
+      --card-rotate: -4deg;
+    }
+
+    .globe-card[data-position="bottom-left"] {
+      --card-x: -145px;
+      --card-y: 205px;
+      --card-z: -16px;
+      --card-rotate: 4deg;
+    }
+
+    .globe-card[data-position="left"] {
+      --card-x: -242px;
+      --card-y: 54px;
+      --card-z: 50px;
+      --card-rotate: -7deg;
+    }
+
+    .globe-card[data-position="top-left"] {
+      --card-x: -190px;
+      --card-y: -126px;
+      --card-z: -32px;
+      --card-rotate: -4deg;
+    }
+
+    .globe-hint {
+      position: absolute;
+      left: 50%;
+      bottom: -2px;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: 90%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #5e8794;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .globe-hint::before,
+    .globe-hint::after {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: rgba(84, 246, 255, 0.32);
+    }
+
+    /* =========================================================
+       6. SECTION UMUM
+       ========================================================= */
+    .content {
+      position: relative;
+      z-index: 2;
+      width: min(1180px, calc(100% - 36px));
+      margin-inline: auto;
+    }
+
+    .section {
+      min-height: 85svh;
+      padding: clamp(80px, 10vw, 130px) 0;
+      display: grid;
+      align-items: center;
+      scroll-margin-top: calc(var(--header-height) + 20px);
+    }
+
+    .section-header {
+      max-width: 760px;
+      margin-bottom: 38px;
+    }
+
+    .section-index {
+      color: var(--cyan);
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 8px 0 0;
+      font-size: clamp(2.2rem, 6vw, 4.9rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .section-subtitle {
+      max-width: 650px;
+      margin: 17px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .holo-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(84, 246, 255, 0.25);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(140deg, rgba(84, 246, 255, 0.07), transparent 38%),
+        rgba(3, 16, 28, 0.68);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .holo-panel::before {
+      content: "";
+      position: absolute;
+      left: -30%;
+      top: 0;
+      width: 24%;
+      height: 100%;
+      transform: skewX(-20deg);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(84, 246, 255, 0.09),
+        transparent
+      );
+      animation: panelScan 7s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* =========================================================
+       7. ABOUT
+       ========================================================= */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 24px;
+    }
+
+    .profile-module {
+      min-height: 420px;
+      padding: clamp(24px, 4vw, 44px);
+      display: grid;
+      place-items: center;
+    }
+
+    .profile-ring {
+      position: relative;
+      width: min(280px, 72vw);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(84, 246, 255, 0.35);
+      border-radius: 50%;
+      box-shadow:
+        inset 0 0 50px rgba(84, 246, 255, 0.07),
+        0 0 35px rgba(84, 246, 255, 0.1);
+    }
+
+    .profile-ring::before,
+    .profile-ring::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .profile-ring::before {
+      inset: -13px;
+      border: 1px dashed rgba(84, 246, 255, 0.32);
+      animation: spin 19s linear infinite;
+    }
+
+    .profile-ring::after {
+      inset: 20px;
+      border: 1px dotted rgba(84, 246, 255, 0.28);
+      animation: spin 10s linear infinite reverse;
+    }
+
+    .initials {
+      color: transparent;
+      -webkit-text-stroke: 1px var(--cyan);
+      font-size: clamp(4rem, 11vw, 7rem);
+      font-weight: 900;
+      letter-spacing: -0.07em;
+      text-shadow: 0 0 23px rgba(84, 246, 255, 0.44);
+    }
+
+    .about-copy {
+      padding: clamp(26px, 5vw, 52px);
+      display: grid;
+      align-content: center;
+    }
+
+    .terminal-label {
+      margin-bottom: 16px;
+      color: var(--cyan);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .about-copy p {
+      margin: 0;
+      color: #b2cbd2;
+      font-size: clamp(1rem, 1.8vw, 1.16rem);
+      line-height: 1.85;
+    }
+
+    .about-copy p + p {
+      margin-top: 17px;
+    }
+
+    .about-stats {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 11px;
+    }
+
+    .stat {
+      padding: 15px;
+      border: 1px solid rgba(84, 246, 255, 0.17);
+      background: rgba(84, 246, 255, 0.025);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--cyan);
+      font-size: 1.45rem;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: #678995;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       8. SKILLS
+       ========================================================= */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 17px;
+    }
+
+    .skill-module {
+      min-height: 230px;
+      padding: 25px;
+    }
+
+    .skill-number {
+      color: rgba(84, 246, 255, 0.44);
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+    }
+
+    .skill-module h3 {
+      margin: 46px 0 12px;
+      font-size: 1.22rem;
+      text-transform: uppercase;
+    }
+
+    .skill-module p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .skill-tags {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .skill-tags span {
+      padding: 6px 9px;
+      border: 1px solid rgba(84, 246, 255, 0.2);
+      color: var(--cyan);
+      background: rgba(84, 246, 255, 0.04);
+      font-size: 0.61rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       9. PROJECTS
+       ========================================================= */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .project-card {
+      min-height: 390px;
+      padding: 0;
+      display: grid;
+      grid-template-rows: 190px 1fr;
+      cursor: pointer;
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    .project-card:nth-child(1) {
+      grid-column: span 7;
+    }
+
+    .project-card:nth-child(2) {
+      grid-column: span 5;
+    }
+
+    .project-card:nth-child(3) {
+      grid-column: span 5;
+    }
+
+    .project-card:nth-child(4) {
+      grid-column: span 7;
+    }
+
+    .project-card:hover,
+    .project-card:focus-visible {
+      transform: translateY(-6px);
+      border-color: rgba(84, 246, 255, 0.62);
+      outline: none;
+    }
+
+    .project-visual {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(84, 246, 255, 0.18);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(84, 246, 255, 0.17), transparent 25%),
+        linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(61, 125, 255, 0.02));
+    }
+
+    .project-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.62;
+      filter: grayscale(0.8) contrast(1.18) saturate(1.25) hue-rotate(135deg);
+      transition: transform 500ms ease, opacity 300ms ease;
+    }
+
+    .project-card:hover img,
+    .project-card:focus-visible img {
+      transform: scale(1.05);
+      opacity: 0.78;
+    }
+
+    .visual-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgba(2, 10, 18, 0.82), transparent 55%),
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0 4px,
+          rgba(84, 246, 255, 0.07) 5px
+        );
+    }
+
+    .project-code {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 6px 9px;
+      border: 1px solid rgba(84, 246, 255, 0.36);
+      color: var(--cyan);
+      background: rgba(2, 9, 16, 0.72);
+      font-size: 0.59rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+
+    .project-body {
+      padding: 23px;
+      display: grid;
+      align-content: start;
+    }
+
+    .project-body h3 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.4vw, 1.62rem);
+      text-transform: uppercase;
+    }
+
+    .project-body p {
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .project-meta {
+      margin-top: 19px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .project-meta span {
+      padding: 5px 8px;
+      border: 1px solid rgba(84, 246, 255, 0.17);
+      color: #8deaf1;
+      font-size: 0.57rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       10. CONTACT
+       ========================================================= */
+    .contact-panel {
+      padding: clamp(28px, 7vw, 72px);
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: end;
+      gap: 34px;
+    }
+
+    .contact-panel h2 {
+      margin: 0;
+      font-size: clamp(2.3rem, 7vw, 5.6rem);
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+    }
+
+    .contact-panel p {
+      max-width: 650px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .contact-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .contact-link {
+      min-height: 52px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border: 1px solid rgba(84, 246, 255, 0.2);
+      color: var(--muted);
+      background: rgba(84, 246, 255, 0.025);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .contact-link:hover,
+    .contact-link:focus-visible {
+      color: var(--white);
+      border-color: var(--cyan);
+      background: rgba(84, 246, 255, 0.07);
+    }
+
+    .contact-link span:last-child {
+      color: var(--cyan);
+    }
+
+    /* =========================================================
+       11. MODAL PROYEK
+       ========================================================= */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+      display: grid;
+      place-items: center;
+      visibility: hidden;
+      opacity: 0;
+      background: rgba(0, 3, 8, 0.78);
+      backdrop-filter: blur(13px);
+      transition: opacity 180ms ease, visibility 180ms ease;
+    }
+
+    .modal.is-open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-dialog {
+      position: relative;
+      width: min(720px, 100%);
+      max-height: min(760px, 90svh);
+      overflow-y: auto;
+      padding: clamp(25px, 5vw, 48px);
+      border: 1px solid rgba(84, 246, 255, 0.5);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(84, 246, 255, 0.09), transparent 40%),
+        rgba(2, 15, 27, 0.96);
+      box-shadow:
+        inset 0 0 30px rgba(84, 246, 255, 0.06),
+        0 0 42px rgba(0, 217, 255, 0.23);
+      transform: scale(0.95) translateY(15px);
+      transition: transform 220ms ease;
+    }
+
+    .modal.is-open .modal-dialog {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(84, 246, 255, 0.24);
+      color: var(--cyan);
+      background: rgba(84, 246, 255, 0.04);
+      cursor: pointer;
+    }
+
+    .modal-kicker {
+      color: var(--cyan);
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .modal-title {
+      margin: 12px 0 0;
+      font-size: clamp(2rem, 7vw, 4rem);
+      line-height: 0.98;
+      text-transform: uppercase;
+    }
+
+    .modal-description {
+      margin: 20px 0 0;
+      color: #adc8d0;
+      line-height: 1.78;
+    }
+
+    .modal-tech {
+      margin-top: 23px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .modal-tech span {
+      padding: 7px 10px;
+      border: 1px solid rgba(84, 246, 255, 0.22);
+      color: var(--cyan);
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .modal-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+    }
+
+    /* =========================================================
+       12. FOOTER DAN SCROLL INDICATOR
+       ========================================================= */
+    footer {
+      width: min(1180px, calc(100% - 36px));
+      margin-inline: auto;
+      padding: 26px 0 calc(30px + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      border-top: 1px solid rgba(84, 246, 255, 0.12);
+      color: #577783;
+      font-size: 0.67rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 90;
+      width: 0%;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition:
+        opacity 700ms ease,
+        transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+       13. ANIMASI
+       ========================================================= */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: 0.38;
+      }
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes corePulse {
+      50% {
+        transform: scale(1.055);
+        filter: brightness(1.22);
+      }
+    }
+
+    @keyframes gridPulse {
+      50% {
+        opacity: 0.46;
+        transform: scale(0.985);
+      }
+    }
+
+    @keyframes panelScan {
+      0%,
+      15% {
+        left: -35%;
+      }
+      65%,
+      100% {
+        left: 125%;
+      }
+    }
+
+    @keyframes orbitDrift {
+      to {
+        transform: rotateX(73deg) rotateZ(370deg);
+      }
+    }
+
+    @keyframes orbitDriftVertical {
+      to {
+        transform: rotateY(78deg) rotateZ(378deg);
+      }
+    }
+
+    /* =========================================================
+       14. RESPONSIVE
+       ========================================================= */
+    @media (max-width: 980px) {
+      :root {
+        --header-height: 68px;
+      }
+
+      .hud-status {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: calc(var(--header-height) + 62px);
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy {
+        margin-inline: auto;
+        text-align: center;
+      }
+
+      .eyebrow {
+        justify-content: center;
+      }
+
+      .hero-description {
+        margin-inline: auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .system-readout {
+        text-align: left;
+      }
+
+      .globe-column {
+        min-height: min(720px, 78svh);
+      }
+
+      .about-grid,
+      .contact-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        height: auto;
+        min-height: var(--header-height);
+      }
+
+      .brand-name {
+        display: none;
+      }
+
+      .nav-links {
+        gap: 13px;
+      }
+
+      .nav-links li:nth-child(2) {
+        display: none;
+      }
+
+      .nav-links a {
+        font-size: 0.63rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(3rem, 17vw, 5.7rem);
+      }
+
+      .globe-column {
+        min-height: 600px;
+      }
+
+      .globe-shell {
+        width: min(430px, 94vw);
+      }
+
+      .globe-card {
+        width: 112px;
+        min-height: 72px;
+        padding: 9px;
+      }
+
+      .globe-card span {
+        display: none;
+      }
+
+      .globe-card[data-position="top"] {
+        --card-y: -182px;
+      }
+
+      .globe-card[data-position="top-right"] {
+        --card-x: 144px;
+        --card-y: -106px;
+      }
+
+      .globe-card[data-position="right"] {
+        --card-x: 165px;
+        --card-y: 52px;
+      }
+
+      .globe-card[data-position="bottom-right"] {
+        --card-x: 112px;
+        --card-y: 164px;
+      }
+
+      .globe-card[data-position="bottom-left"] {
+        --card-x: -112px;
+        --card-y: 164px;
+      }
+
+      .globe-card[data-position="left"] {
+        --card-x: -165px;
+        --card-y: 52px;
+      }
+
+      .globe-card[data-position="top-left"] {
+        --card-x: -144px;
+        --card-y: -106px;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card,
+      .project-card:nth-child(n) {
+        grid-column: 1 / -1;
+      }
+
+      .about-stats {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .nav-links li:nth-child(1) {
+        display: none;
+      }
+
+      .hero {
+        padding-inline: 15px;
+      }
+
+      .system-readout {
+        grid-template-columns: 1fr;
+      }
+
+      .globe-column {
+        min-height: 540px;
+      }
+
+      .globe-shell {
+        width: 375px;
+        max-width: 100vw;
+        transform: scale(0.91);
+      }
+
+      .globe-card {
+        width: 99px;
+      }
+
+      .globe-card strong {
+        font-size: 0.67rem;
+      }
+
+      .globe-card[data-position="top"] {
+        --card-y: -162px;
+      }
+
+      .globe-card[data-position="top-right"] {
+        --card-x: 125px;
+        --card-y: -91px;
+      }
+
+      .globe-card[data-position="right"] {
+        --card-x: 143px;
+        --card-y: 46px;
+      }
+
+      .globe-card[data-position="bottom-right"] {
+        --card-x: 97px;
+        --card-y: 145px;
+      }
+
+      .globe-card[data-position="bottom-left"] {
+        --card-x: -97px;
+        --card-y: 145px;
+      }
+
+      .globe-card[data-position="left"] {
+        --card-x: -143px;
+        --card-y: 46px;
+      }
+
+      .globe-card[data-position="top-left"] {
+        --card-x: -125px;
+        --card-y: -91px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="ambient-glow" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- =======================================================
+       NAVIGASI
+       ======================================================= -->
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Kembali ke beranda">
+      <span class="brand-core">BA</span>
+      <span class="brand-name">Benaya System</span>
+    </a>
+
+    <nav aria-label="Navigasi utama">
+      <ul class="nav-links">
+        <li><a href="#about">Tentang</a></li>
+        <li><a href="#skills">Keahlian</a></li>
+        <li><a href="#projects">Proyek</a></li>
+        <li><a href="#contact">Kontak</a></li>
+      </ul>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <p class="greeting">Halo, perkenalkan saya</p>
-            <h1>Benaya Arlen</h1>
-            <h2 class="typing-text">Saya seorang <span id="typewriter"></span><span class="cursor">|</span></h2>
-            <a href="#projects" class="btn-primary">Lihat Pekerjaan Saya</a>
-        </div>
-    </header>
+    <div class="hud-status" aria-label="Status sistem">
+      <span class="status-dot"></span>
+      System Online
+    </div>
+  </header>
 
-    <div class="container">
-        
-        <section id="about" class="section-card fade-in">
-            <h3 class="section-title">Tentang Saya</h3>
-            <p>Saya memiliki minat mendalam dalam memecahkan masalah kompleks melalui teknologi. Saat ini, saya fokus mengejar peluang <strong>IT Internship</strong> untuk berkontribusi di lingkungan korporat, khususnya industri perbankan yang menuntut presisi dan keandalan data. Saya terbiasa menganalisis data, membangun model cerdas, dan merancangnya menjadi solusi yang aplikatif.</p>
-        </section>
+  <main>
+    <!-- =====================================================
+         HERO + GLOBE
+         ===================================================== -->
+    <section class="hero" id="home">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Personal Interface / 2026</p>
 
-        <section id="skills" class="section-card fade-in">
-            <h3 class="section-title">Keahlian Teknis</h3>
-            <div class="skills-container">
-                <span class="skill-badge python">Python (AI & Data)</span>
-                <span class="skill-badge web">HTML5 & CSS3</span>
-                <span class="skill-badge git">Git & Version Control</span>
-                <span class="skill-badge logic">Problem Solving</span>
-                <span class="skill-badge logic">Data Analysis</span>
+          <h1>
+            Benaya
+            <span>Arlen</span>
+          </h1>
+
+          <p class="role-line">
+            Saya seorang
+            <span id="typewriter"></span><span class="cursor">|</span>
+          </p>
+
+          <p class="hero-description">
+            Saya mengembangkan solusi web, aplikasi, dan sistem berbasis
+            kecerdasan buatan. Portofolio ini dirancang sebagai antarmuka
+            holografik interaktif yang dapat diputar melalui sentuhan,
+            gerakan penunjuk, dan scroll.
+          </p>
+
+          <div class="hero-actions">
+            <a class="hud-button" href="#projects">
+              Akses Proyek
+              <span aria-hidden="true">↘</span>
+            </a>
+
+            <a
+              class="hud-button secondary"
+              href="https://github.com/benayaarlen-creator"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="system-readout" aria-label="Ringkasan profil">
+            <div class="readout-item">
+              <span class="readout-label">Focus</span>
+              <span class="readout-value">Software + AI</span>
             </div>
-        </section>
-
-        <section id="projects" class="fade-in">
-            <h3 class="section-title text-center">Project Unggulan</h3>
-            <div class="projects-grid">
-                
-                <a href="chatbot.html" class="card-link-wrapper">
-                    <div class="project-card">
-                        <img src="rasa.png" alt="Medical Chatbot" class="project-img">
-                        <h4>Medical Chatbot</h4>
-                        <p>Pengembangan chatbot medis berbasis Artificial Intelligence untuk mendeteksi gejala awal pasien dan memberikan rekomendasi kesehatan.</p>
-                        <div class="project-tags">
-                            <span>Python</span><span>RASA NLU</span><span>Medical Tech</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="OP.html" class="card-link-wrapper">
-    <div class="project-card">
-        <img src="OPlogo.png" alt="Website Onda Printing" class="project-img">
-
-        <h4>Website Perusahaan Onda Printing</h4>
-
-        <p>
-            Website company profile yang dirancang untuk memperkenalkan
-            layanan, produk, dan informasi perusahaan Onda Printing kepada
-            pelanggan secara responsif.
-        </p>
-
-        <div class="project-tags">
-            <span>HTML</span>
-            <span>CSS</span>
-            <span>JavaScript</span>
-            <span>Responsive Web</span>
-        </div>
-    </div>
-</a>
-
-<a href="#" class="card-link-wrapper">
-    <div class="project-card">
-        <img
-            src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=600&q=80"
-            alt="Multimodal Emotion Recognition"
-            class="project-img"
-        >
-
-        <h4>Multimodal Emotion Recognition</h4>
-
-        <p>
-            Model deteksi emosi berbasis audio dan ekspresi wajah menggunakan
-            CRNN dan Model-Level Fusion dengan dataset RAVDESS.
-        </p>
-
-        <div class="project-tags">
-            <span>Python</span>
-            <span>TensorFlow</span>
-            <span>OpenCV</span>
-            <span>CRNN</span>
-        </div>
-    </div>
-</a>
-
-<a
-    href="https://github.com/benayaarlen-creator/New-folder"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="card-link-wrapper"
->
-    <div class="project-card">
-        <img
-            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80"
-            alt="Website Portofolio Benaya Arlen"
-            class="project-img"
-        >
-
-        <h4>Website Portofolio Responsif</h4>
-
-        <p>
-            Website portofolio pribadi yang responsif untuk menampilkan
-            profil, kemampuan teknis, dan proyek. Dilengkapi animasi teks
-            serta pilihan mode terang dan gelap.
-        </p>
-
-        <div class="project-tags">
-            <span>HTML</span>
-            <span>CSS</span>
-            <span>JavaScript</span>
-            <span>GitHub Pages</span>
-        </div>
-    </div>
-</a>
-                    <div class="project-card">
-                        <img src="OPlogo.png" alt="WEB Onda Printing" class="project-img">
-                        <h4>WEB Perusahaan Onda Printing</h4>
-                        <p>Pengembangan chatbot medis berbasis Artificial Intelligence untuk mendeteksi gejala awal pasien dan memberikan rekomendasi kesehatan.</p>
-                        <div class="project-tags">
-                            <span>Python</span><span>RASA NLU</span><span>Medical Tech</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="https://github.com/benayaarlen-creator/New-folder" target="_blank" class="card-link-wrapper">
-                    <div class="project-card">
-                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ilustrasi Web" class="project-img">
-                        <h4>Website Portofolio Responsif</h4>
-                        <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern. Dilengkapi fitur Dark Mode.</p>
-                        <div class="project-tags">
-                            <span>HTML</span><span>CSS</span><span>GitHub</span>
-                        </div>
-                    </div>
-                </a>
-                <a href="https://github.com/benayaarlen-creator/New-folder" target="_blank" class="card-link-wrapper">
-                    <div class="project-card">
-                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ilustrasi Web" class="project-img">
-                        <h4>Website Portofolio Responsif</h4>
-                        <p>Merancang antarmuka website yang bersih dan responsif menggunakan HTML5 dan CSS3 Modern. Dilengkapi fitur Dark Mode.</p>
-                        <div class="project-tags">
-                            <span>HTML</span><span>CSS</span><span>GitHub</span>
-                        </div>
-                    </div>
-                </a>
-
+            <div class="readout-item">
+              <span class="readout-label">Location</span>
+              <span class="readout-value">Indonesia</span>
             </div>
-        </section>
+            <div class="readout-item">
+              <span class="readout-label">Availability</span>
+              <span class="readout-value">Open to Work</span>
+            </div>
+          </div>
+        </div>
 
+        <div
+          class="globe-column"
+          id="globeController"
+          aria-label="Globe portofolio interaktif. Geser untuk memutar."
+        >
+          <div class="globe-shell" id="globeShell">
+            <div class="orbit one" aria-hidden="true"></div>
+            <div class="orbit two" aria-hidden="true"></div>
+            <div class="orbit three" aria-hidden="true"></div>
+            <div class="globe-grid" aria-hidden="true"></div>
+
+            <div class="arc-core" aria-hidden="true">
+              <span class="core-label">Portfolio<br />Core</span>
+            </div>
+
+            <div class="globe-items" id="globeItems">
+              <button
+                class="globe-card"
+                data-position="top"
+                data-target="#about"
+                type="button"
+              >
+                <small>Module 01</small>
+                <strong>Tentang Saya</strong>
+                <span>Profil dan fokus pengembangan</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="top-right"
+                data-project="emotion"
+                type="button"
+              >
+                <small>AI System</small>
+                <strong>Emotion Recognition</strong>
+                <span>CRNN + Model-Level Fusion</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="right"
+                data-project="chatbot"
+                type="button"
+              >
+                <small>NLP System</small>
+                <strong>Medical Chatbot</strong>
+                <span>RASA NLU dan Python</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="bottom-right"
+                data-target="#contact"
+                type="button"
+              >
+                <small>Channel</small>
+                <strong>Kontak</strong>
+                <span>Hubungi dan kolaborasi</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="bottom-left"
+                data-project="portfolio"
+                type="button"
+              >
+                <small>Interface</small>
+                <strong>Holographic Portfolio</strong>
+                <span>HTML, CSS, dan JavaScript</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="left"
+                data-project="onda"
+                type="button"
+              >
+                <small>Web System</small>
+                <strong>Onda Printing</strong>
+                <span>Website perusahaan responsif</span>
+              </button>
+
+              <button
+                class="globe-card"
+                data-position="top-left"
+                data-target="#skills"
+                type="button"
+              >
+                <small>Module 02</small>
+                <strong>Keahlian</strong>
+                <span>Web, data, AI, dan Git</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="globe-hint">
+            Geser globe atau scroll halaman
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="content">
+      <!-- ===================================================
+           ABOUT
+           =================================================== -->
+      <section class="section reveal" id="about">
+        <div>
+          <div class="section-header">
+            <span class="section-index">01 / Identity Module</span>
+            <h2 class="section-title">Tentang Saya</h2>
+            <p class="section-subtitle">
+              Pengembang yang tertarik menggabungkan desain antarmuka,
+              pemrograman, pengolahan data, dan kecerdasan buatan menjadi
+              solusi yang dapat digunakan.
+            </p>
+          </div>
+
+          <div class="about-grid">
+            <div class="holo-panel profile-module">
+              <div class="profile-ring">
+                <!-- Ganti BA dengan foto Anda nanti bila diperlukan -->
+                <span class="initials">BA</span>
+              </div>
+            </div>
+
+            <article class="holo-panel about-copy">
+              <span class="terminal-label">&gt; profile_data.loaded</span>
+
+              <p>
+                Saya memiliki minat dalam memecahkan masalah melalui teknologi.
+                Saat ini saya mengembangkan kemampuan pada bidang pengembangan
+                web, aplikasi, analisis data, dan kecerdasan buatan.
+              </p>
+
+              <p>
+                Salah satu fokus penelitian saya adalah deteksi emosi
+                multimodal menggunakan data audio dan visual dengan pendekatan
+                <em>Convolutional Recurrent Neural Network</em> dan
+                <em>Model-Level Fusion</em>.
+              </p>
+
+              <div class="about-stats">
+                <div class="stat">
+                  <strong>04+</strong>
+                  <span>Project Modules</span>
+                </div>
+                <div class="stat">
+                  <strong>AI</strong>
+                  <span>Research Focus</span>
+                </div>
+                <div class="stat">
+                  <strong>∞</strong>
+                  <span>Learning Mode</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           SKILLS
+           =================================================== -->
+      <section class="section reveal" id="skills">
+        <div>
+          <div class="section-header">
+            <span class="section-index">02 / Capability Matrix</span>
+            <h2 class="section-title">Keahlian Teknis</h2>
+            <p class="section-subtitle">
+              Teknologi yang digunakan untuk membangun antarmuka, mengolah
+              data, mengembangkan model, dan mengelola versi proyek.
+            </p>
+          </div>
+
+          <div class="skills-grid">
+            <article class="holo-panel skill-module">
+              <span class="skill-number">SYS-01</span>
+              <h3>Web Interface</h3>
+              <p>
+                Membangun antarmuka web responsif, interaktif, dan dapat
+                digunakan pada desktop maupun perangkat bergerak.
+              </p>
+              <div class="skill-tags">
+                <span>HTML5</span>
+                <span>CSS3</span>
+                <span>JavaScript</span>
+                <span>Responsive UI</span>
+              </div>
+            </article>
+
+            <article class="holo-panel skill-module">
+              <span class="skill-number">SYS-02</span>
+              <h3>AI & Data</h3>
+              <p>
+                Mengolah dataset serta mengembangkan model pembelajaran mesin
+                untuk data audio dan visual.
+              </p>
+              <div class="skill-tags">
+                <span>Python</span>
+                <span>TensorFlow</span>
+                <span>OpenCV</span>
+                <span>CRNN</span>
+              </div>
+            </article>
+
+            <article class="holo-panel skill-module">
+              <span class="skill-number">SYS-03</span>
+              <h3>Development Tools</h3>
+              <p>
+                Mengelola kode, dokumentasi, perubahan versi, dan publikasi
+                proyek menggunakan alur kerja pengembangan modern.
+              </p>
+              <div class="skill-tags">
+                <span>Git</span>
+                <span>GitHub</span>
+                <span>VS Code</span>
+                <span>GitHub Pages</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           PROJECTS
+           =================================================== -->
+      <section class="section reveal" id="projects">
+        <div>
+          <div class="section-header">
+            <span class="section-index">03 / Project Archive</span>
+            <h2 class="section-title">Proyek Unggulan</h2>
+            <p class="section-subtitle">
+              Pilih salah satu proyek untuk membuka data dalam panel
+              holografik. Tautan halaman lama tetap dapat digunakan.
+            </p>
+          </div>
+
+          <div class="project-grid">
+            <article
+              class="holo-panel project-card"
+              tabindex="0"
+              role="button"
+              data-project="emotion"
+              aria-label="Buka detail Multimodal Emotion Recognition"
+            >
+              <div class="project-visual">
+                <img
+                  src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&w=1200&q=80"
+                  alt="Ilustrasi teknologi kecerdasan buatan"
+                />
+                <div class="visual-overlay"></div>
+                <span class="project-code">PROJECT / 001</span>
+              </div>
+
+              <div class="project-body">
+                <h3>Multimodal Emotion Recognition</h3>
+                <p>
+                  Sistem klasifikasi emosi berbasis audio dan ekspresi wajah
+                  menggunakan CRNN dan Model-Level Fusion.
+                </p>
+                <div class="project-meta">
+                  <span>Python</span>
+                  <span>TensorFlow</span>
+                  <span>OpenCV</span>
+                  <span>RAVDESS</span>
+                </div>
+              </div>
+            </article>
+
+            <article
+              class="holo-panel project-card"
+              tabindex="0"
+              role="button"
+              data-project="chatbot"
+              aria-label="Buka detail Medical Chatbot"
+            >
+              <div class="project-visual">
+                <img src="rasa.png" alt="Tampilan Medical Chatbot" />
+                <div class="visual-overlay"></div>
+                <span class="project-code">PROJECT / 002</span>
+              </div>
+
+              <div class="project-body">
+                <h3>Medical Chatbot</h3>
+                <p>
+                  Chatbot berbasis kecerdasan buatan untuk membantu
+                  mengidentifikasi gejala awal dan menyajikan respons
+                  kesehatan.
+                </p>
+                <div class="project-meta">
+                  <span>Python</span>
+                  <span>RASA NLU</span>
+                  <span>NLP</span>
+                </div>
+              </div>
+            </article>
+
+            <article
+              class="holo-panel project-card"
+              tabindex="0"
+              role="button"
+              data-project="onda"
+              aria-label="Buka detail website Onda Printing"
+            >
+              <div class="project-visual">
+                <img src="OPlogo.png" alt="Logo Onda Printing" />
+                <div class="visual-overlay"></div>
+                <span class="project-code">PROJECT / 003</span>
+              </div>
+
+              <div class="project-body">
+                <h3>Onda Printing Website</h3>
+                <p>
+                  Website perusahaan responsif untuk menampilkan profil,
+                  layanan, produk, dan informasi kontak Onda Printing.
+                </p>
+                <div class="project-meta">
+                  <span>HTML</span>
+                  <span>CSS</span>
+                  <span>JavaScript</span>
+                </div>
+              </div>
+            </article>
+
+            <article
+              class="holo-panel project-card"
+              tabindex="0"
+              role="button"
+              data-project="portfolio"
+              aria-label="Buka detail Holographic Portfolio"
+            >
+              <div class="project-visual">
+                <img
+                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+                  alt="Ilustrasi papan sirkuit"
+                />
+                <div class="visual-overlay"></div>
+                <span class="project-code">PROJECT / 004</span>
+              </div>
+
+              <div class="project-body">
+                <h3>Holographic Portfolio</h3>
+                <p>
+                  Eksperimen antarmuka futuristik dengan globe interaktif,
+                  cahaya neon, partikel, panel hologram, dan respons sentuhan.
+                </p>
+                <div class="project-meta">
+                  <span>UI Design</span>
+                  <span>CSS 3D</span>
+                  <span>JavaScript</span>
+                  <span>Responsive</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           CONTACT
+           =================================================== -->
+      <section class="section reveal" id="contact">
+        <div class="holo-panel contact-panel">
+          <div>
+            <span class="section-index">04 / Communication Channel</span>
+            <h2>Mulai Sebuah<br />Kolaborasi</h2>
+            <p>
+              Saya terbuka untuk peluang kerja, magang, kolaborasi proyek,
+              pengembangan website, dan diskusi seputar teknologi.
+            </p>
+          </div>
+
+          <div class="contact-links">
+            <!-- Ganti href email bila ingin memakai email lain -->
+            <a
+              class="contact-link"
+              href="mailto:gammablacksmitch@gmail.com"
+            >
+              <span>Email</span>
+              <span>↗</span>
+            </a>
+
+            <a
+              class="contact-link"
+              href="https://github.com/benayaarlen-creator"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>GitHub</span>
+              <span>↗</span>
+            </a>
+
+            <!-- Ganti # dengan URL LinkedIn Anda -->
+            <a class="contact-link" href="#" aria-label="LinkedIn belum ditambahkan">
+              <span>LinkedIn</span>
+              <span>+</span>
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
+  </main>
 
-    <footer>
-        <p>&copy; 2026 Benaya Arlen. Dideploy melalui GitHub Pages.</p>
-    </footer>
+  <footer>
+    <span>© <span id="year"></span> Benaya Arlen</span>
+    <span>Interface Status: Stable Prototype</span>
+  </footer>
 
-    <script>
-        // 1. Script Animasi Mengetik
-        const words = ["Tech Enthusiast.", "Problem Solver.", "IT Intern Candidate."];
-        let i = 0, timer;
-        function typingEffect() {
-            let word = words[i].split("");
-            var loopTyping = function() {
-                if (word.length > 0) {
-                    document.getElementById('typewriter').innerHTML += word.shift();
-                } else {
-                    setTimeout(deletingEffect, 2000);
-                    return false;
-                };
-                timer = setTimeout(loopTyping, 100);
-            };
-            loopTyping();
+  <!-- =======================================================
+       MODAL DETAIL PROYEK
+       ======================================================= -->
+  <div
+    class="modal"
+    id="projectModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Tutup panel">
+        ✕
+      </button>
+
+      <span class="modal-kicker" id="modalKicker">Project Data</span>
+      <h2 class="modal-title" id="modalTitle">Project Name</h2>
+      <p class="modal-description" id="modalDescription"></p>
+      <div class="modal-tech" id="modalTech"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    /* =========================================================
+       1. DATA PROYEK
+       Edit bagian ini untuk mengganti isi modal.
+       ========================================================= */
+    const projects = {
+      emotion: {
+        kicker: "AI SYSTEM / PROJECT 001",
+        title: "Multimodal Emotion Recognition",
+        description:
+          "Sistem deteksi emosi menggunakan data audio dan ekspresi wajah dari dataset RAVDESS. Cabang visual dan audio diproses menggunakan pendekatan Convolutional Recurrent Neural Network, lalu digabungkan pada tingkat model menggunakan Model-Level Fusion.",
+        tech: ["Python", "TensorFlow", "OpenCV", "Librosa", "CRNN", "RAVDESS"],
+        links: [
+          {
+            label: "Repository Segera Hadir",
+            href: "#",
+            secondary: true
+          }
+        ]
+      },
+
+      chatbot: {
+        kicker: "NLP SYSTEM / PROJECT 002",
+        title: "Medical Chatbot",
+        description:
+          "Chatbot berbasis Natural Language Processing yang dikembangkan untuk memahami masukan pengguna terkait gejala awal dan menghasilkan respons kesehatan melalui alur percakapan terstruktur.",
+        tech: ["Python", "RASA NLU", "NLP", "Chatbot"],
+        links: [
+          {
+            label: "Buka Detail",
+            href: "chatbot.html"
+          }
+        ]
+      },
+
+      onda: {
+        kicker: "WEB SYSTEM / PROJECT 003",
+        title: "Onda Printing",
+        description:
+          "Website perusahaan yang dirancang untuk memperkenalkan profil, layanan, produk, dan informasi kontak Onda Printing melalui antarmuka yang responsif.",
+        tech: ["HTML5", "CSS3", "JavaScript", "Responsive Web"],
+        links: [
+          {
+            label: "Buka Detail",
+            href: "OP.html"
+          }
+        ]
+      },
+
+      portfolio: {
+        kicker: "INTERFACE / PROJECT 004",
+        title: "Holographic Portfolio",
+        description:
+          "Portofolio interaktif bertema antarmuka futuristik. Versi awal menggunakan CSS 3D, canvas particle system, efek neon, respons sentuhan, rotasi berdasarkan scroll, dan panel detail proyek.",
+        tech: ["HTML5", "CSS 3D", "JavaScript", "Canvas", "Responsive UI"],
+        links: [
+          {
+            label: "Lihat Repository",
+            href: "https://github.com/benayaarlen-creator/New-folder",
+            external: true
+          }
+        ]
+      }
+    };
+
+    /* =========================================================
+       2. TYPEWRITER
+       ========================================================= */
+    const words = [
+      "Software Developer.",
+      "AI Enthusiast.",
+      "Problem Solver.",
+      "UI Explorer."
+    ];
+
+    const typewriterElement = document.getElementById("typewriter");
+    let wordIndex = 0;
+    let characterIndex = 0;
+    let isDeleting = false;
+
+    function runTypewriter() {
+      const currentWord = words[wordIndex];
+
+      if (isDeleting) {
+        characterIndex -= 1;
+      } else {
+        characterIndex += 1;
+      }
+
+      typewriterElement.textContent = currentWord.slice(0, characterIndex);
+
+      let delay = isDeleting ? 45 : 85;
+
+      if (!isDeleting && characterIndex === currentWord.length) {
+        delay = 1450;
+        isDeleting = true;
+      } else if (isDeleting && characterIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        delay = 260;
+      }
+
+      window.setTimeout(runTypewriter, delay);
+    }
+
+    runTypewriter();
+
+    /* =========================================================
+       3. CANVAS STARFIELD
+       ========================================================= */
+    const canvas = document.getElementById("starfield");
+    const context = canvas.getContext("2d");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let stars = [];
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let animationFrameId = null;
+
+    function createStars() {
+      const amount = Math.min(
+        130,
+        Math.max(45, Math.floor((canvasWidth * canvasHeight) / 13000))
+      );
+
+      stars = Array.from({ length: amount }, () => ({
+        x: Math.random() * canvasWidth,
+        y: Math.random() * canvasHeight,
+        radius: Math.random() * 1.25 + 0.25,
+        speed: Math.random() * 0.13 + 0.03,
+        alpha: Math.random() * 0.7 + 0.2
+      }));
+    }
+
+    function resizeCanvas() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.7);
+
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
+
+      canvas.width = Math.floor(canvasWidth * ratio);
+      canvas.height = Math.floor(canvasHeight * ratio);
+      canvas.style.width = `${canvasWidth}px`;
+      canvas.style.height = `${canvasHeight}px`;
+
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      createStars();
+    }
+
+    function drawStars() {
+      context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      for (const star of stars) {
+        star.y += star.speed;
+
+        if (star.y > canvasHeight + 2) {
+          star.y = -2;
+          star.x = Math.random() * canvasWidth;
         }
-        function deletingEffect() {
-            let word = words[i].split("");
-            var loopDeleting = function() {
-                if (word.length > 0) {
-                    word.pop();
-                    document.getElementById('typewriter').innerHTML = word.join("");
-                } else {
-                    if (words.length > (i + 1)) { i++; } else { i = 0; };
-                    typingEffect();
-                    return false;
-                };
-                timer = setTimeout(loopDeleting, 50);
-            };
-            loopDeleting();
-        }
-        typingEffect();
 
-        // 2. Script Dark Mode Toggle
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const body = document.body;
-        
-        // Cek apakah sebelumnya user sudah memilih dark mode
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-theme');
-            themeToggleBtn.textContent = '☀️';
-        }
+        context.beginPath();
+        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        context.fillStyle = `rgba(140, 244, 255, ${star.alpha})`;
+        context.fill();
+      }
 
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-theme');
-            
-            // Simpan preferensi & ubah ikon
-            if (body.classList.contains('dark-theme')) {
-                localStorage.setItem('theme', 'dark');
-                themeToggleBtn.textContent = '☀️';
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeToggleBtn.textContent = '🌙';
-            }
+      if (!reduceMotion) {
+        animationFrameId = window.requestAnimationFrame(drawStars);
+      }
+    }
+
+    resizeCanvas();
+    drawStars();
+
+    let resizeTimer;
+
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resizeCanvas();
+
+        if (reduceMotion) {
+          drawStars();
+        }
+      }, 120);
+    });
+
+    /* =========================================================
+       4. GLOBE ROTATION
+       Globe merespons:
+       - auto rotate
+       - pointer / touch drag
+       - scroll
+       ========================================================= */
+    const globeController = document.getElementById("globeController");
+    const globeShell = document.getElementById("globeShell");
+    const globeCards = [...document.querySelectorAll(".globe-card")];
+
+    let rotationX = -3;
+    let rotationY = 0;
+    let targetRotationX = rotationX;
+    let targetRotationY = rotationY;
+    let isDragging = false;
+    let previousPointerX = 0;
+    let previousPointerY = 0;
+    let globeAnimationId = null;
+
+    function updateGlobe() {
+      if (!isDragging && !reduceMotion) {
+        targetRotationY += 0.035;
+      }
+
+      rotationX += (targetRotationX - rotationX) * 0.08;
+      rotationY += (targetRotationY - rotationY) * 0.08;
+
+      globeShell.style.transform =
+        `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+
+      /*
+        Kartu diberi sedikit kompensasi agar teks tidak ikut terbalik penuh.
+        Efeknya bukan fisika 3D sempurna, tetapi lebih nyaman dibaca.
+      */
+      globeCards.forEach((card) => {
+        const baseTransform = getComputedStyle(card).transform;
+        card.style.filter =
+          `brightness(${0.9 + Math.cos((rotationY * Math.PI) / 180) * 0.08})`;
+      });
+
+      if (!reduceMotion) {
+        globeAnimationId = window.requestAnimationFrame(updateGlobe);
+      }
+    }
+
+    updateGlobe();
+
+    globeController.addEventListener("pointerdown", (event) => {
+      isDragging = true;
+      previousPointerX = event.clientX;
+      previousPointerY = event.clientY;
+      globeController.setPointerCapture(event.pointerId);
+    });
+
+    globeController.addEventListener("pointermove", (event) => {
+      if (!isDragging) return;
+
+      const deltaX = event.clientX - previousPointerX;
+      const deltaY = event.clientY - previousPointerY;
+
+      targetRotationY += deltaX * 0.22;
+      targetRotationX -= deltaY * 0.14;
+      targetRotationX = Math.max(-24, Math.min(24, targetRotationX));
+
+      previousPointerX = event.clientX;
+      previousPointerY = event.clientY;
+    });
+
+    function stopDragging(event) {
+      if (!isDragging) return;
+
+      isDragging = false;
+
+      if (event.pointerId !== undefined && globeController.hasPointerCapture(event.pointerId)) {
+        globeController.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    globeController.addEventListener("pointerup", stopDragging);
+    globeController.addEventListener("pointercancel", stopDragging);
+    globeController.addEventListener("pointerleave", stopDragging);
+
+    /* =========================================================
+       5. SCROLL PROGRESS + ROTASI GLOBE
+       ========================================================= */
+    const scrollProgress = document.getElementById("scrollProgress");
+
+    function updateScrollEffects() {
+      const scrollTop = window.scrollY;
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      const progress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+      scrollProgress.style.width = `${progress * 100}%`;
+
+      if (!isDragging) {
+        targetRotationY = progress * 720;
+        targetRotationX = -3 + Math.sin(progress * Math.PI * 4) * 7;
+      }
+    }
+
+    window.addEventListener("scroll", updateScrollEffects, { passive: true });
+    updateScrollEffects();
+
+    /* =========================================================
+       6. NAVIGASI DARI KARTU GLOBE
+       ========================================================= */
+    document.querySelectorAll("[data-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.querySelector(button.dataset.target);
+        target?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+      });
+    });
+
+    /* =========================================================
+       7. MODAL DETAIL PROYEK
+       ========================================================= */
+    const modal = document.getElementById("projectModal");
+    const modalClose = document.getElementById("modalClose");
+    const modalKicker = document.getElementById("modalKicker");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalTech = document.getElementById("modalTech");
+    const modalActions = document.getElementById("modalActions");
+
+    let lastFocusedElement = null;
+
+    function openProjectModal(projectKey) {
+      const project = projects[projectKey];
+
+      if (!project) return;
+
+      lastFocusedElement = document.activeElement;
+      modalKicker.textContent = project.kicker;
+      modalTitle.textContent = project.title;
+      modalDescription.textContent = project.description;
+
+      modalTech.replaceChildren(
+        ...project.tech.map((technology) => {
+          const tag = document.createElement("span");
+          tag.textContent = technology;
+          return tag;
+        })
+      );
+
+      modalActions.replaceChildren(
+        ...project.links.map((link) => {
+          const anchor = document.createElement("a");
+          anchor.className = `hud-button${link.secondary ? " secondary" : ""}`;
+          anchor.href = link.href;
+          anchor.textContent = link.label;
+
+          if (link.external) {
+            anchor.target = "_blank";
+            anchor.rel = "noopener noreferrer";
+          }
+
+          return anchor;
+        })
+      );
+
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      modalClose.focus();
+    }
+
+    function closeProjectModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      lastFocusedElement?.focus();
+    }
+
+    document.querySelectorAll("[data-project]").forEach((element) => {
+      element.addEventListener("click", () => {
+        openProjectModal(element.dataset.project);
+      });
+
+      if (element.getAttribute("role") === "button") {
+        element.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openProjectModal(element.dataset.project);
+          }
         });
-    </script>
+      }
+    });
+
+    modalClose.addEventListener("click", closeProjectModal);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeProjectModal();
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.classList.contains("is-open")) {
+        closeProjectModal();
+      }
+    });
+
+    /* =========================================================
+       8. REVEAL SAAT SECTION MASUK VIEWPORT
+       ========================================================= */
+    const revealElements = document.querySelectorAll(".reveal");
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.13
+      }
+    );
+
+    revealElements.forEach((element) => revealObserver.observe(element));
+
+    /* =========================================================
+       9. TAHUN OTOMATIS
+       ========================================================= */
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
