@@ -222,6 +222,27 @@
       box-shadow: 0 0 10px var(--cyan);
     }
 
+    .zoom-controls {
+      margin-top: 11px;
+      display: grid;
+      grid-template-columns: 38px 1fr 38px;
+      gap: 7px;
+    }
+
+    .zoom-controls button {
+      min-height: 34px;
+      border: 1px solid rgba(88,247,255,.25);
+      color: var(--cyan);
+      background: rgba(88,247,255,.04);
+      font-size: .66rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .zoom-controls button:active {
+      background: rgba(88,247,255,.14);
+    }
+
     .info-panel {
       position: fixed;
       left: 50%;
@@ -464,6 +485,11 @@
   <div class="zoom-indicator">
     <strong><span>Zoom</span><span id="zoomText">100%</span></strong>
     <div class="zoom-track"><div class="zoom-fill" id="zoomFill"></div></div>
+    <div class="zoom-controls">
+      <button type="button" id="zoomOut" aria-label="Perkecil tampilan">−</button>
+      <button type="button" id="zoomReset" aria-label="Kembalikan zoom ke 100 persen">100%</button>
+      <button type="button" id="zoomIn" aria-label="Perbesar tampilan">+</button>
+    </div>
   </div>
 
   <aside class="project-menu" id="projectMenu">
@@ -555,6 +581,9 @@
     const modeBadge = document.getElementById("modeBadge");
     const zoomText = document.getElementById("zoomText");
     const zoomFill = document.getElementById("zoomFill");
+    const zoomOutButton = document.getElementById("zoomOut");
+    const zoomResetButton = document.getElementById("zoomReset");
+    const zoomInButton = document.getElementById("zoomIn");
     const intro = document.getElementById("intro");
     const projectMenu = document.getElementById("projectMenu");
     const menuList = document.getElementById("menuList");
@@ -802,6 +831,10 @@
     let solarBlend = 0;
     let focusAnim = null;
 
+    let autoRotate = true;
+    let resumeAutoRotateAt = 0;
+    const AUTO_ROTATE_SPEED = 0.00115;
+
     function smoothstep(edge0, edge1, x) {
       const t = THREE.MathUtils.clamp((x-edge0)/(edge1-edge0),0,1);
       return t*t*(3-2*t);
@@ -834,6 +867,8 @@
       canvas.setPointerCapture(e.pointerId);
       pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
       dragging = true;
+      autoRotate = false;
+      resumeAutoRotateAt = performance.now() + 2200;
       lastX = e.clientX;
       lastY = e.clientY;
       moved = 0;
@@ -895,6 +930,73 @@
       targetZoom = THREE.MathUtils.clamp(targetZoom,.25,1.65);
     }, {passive:false});
 
+
+    /*
+      Fallback khusus Safari/iPad.
+      Sebagian versi Safari tidak selalu mengirim dua PointerEvent saat pinch.
+    */
+    let touchStartDistance = 0;
+    let touchStartZoom = 1;
+
+    function touchDistance(touches) {
+      if (touches.length < 2) return 0;
+      return Math.hypot(
+        touches[0].clientX - touches[1].clientX,
+        touches[0].clientY - touches[1].clientY
+      );
+    }
+
+    canvas.addEventListener("touchstart", event => {
+      autoRotate = false;
+      resumeAutoRotateAt = performance.now() + 2200;
+
+      if (event.touches.length === 2) {
+        event.preventDefault();
+        touchStartDistance = touchDistance(event.touches);
+        touchStartZoom = targetZoom;
+      }
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", event => {
+      if (event.touches.length !== 2 || touchStartDistance <= 0) return;
+
+      event.preventDefault();
+
+      const currentDistance = touchDistance(event.touches);
+      const ratio = currentDistance / touchStartDistance;
+
+      targetZoom = THREE.MathUtils.clamp(
+        touchStartZoom * ratio,
+        0.25,
+        1.65
+      );
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", event => {
+      if (event.touches.length < 2) {
+        touchStartDistance = 0;
+      }
+      resumeAutoRotateAt = performance.now() + 1700;
+    }, { passive: true });
+
+    zoomOutButton.addEventListener("click", () => {
+      autoRotate = false;
+      targetZoom = THREE.MathUtils.clamp(targetZoom - 0.15, 0.25, 1.65);
+      resumeAutoRotateAt = performance.now() + 1700;
+    });
+
+    zoomResetButton.addEventListener("click", () => {
+      autoRotate = false;
+      targetZoom = 1;
+      resumeAutoRotateAt = performance.now() + 1700;
+    });
+
+    zoomInButton.addEventListener("click", () => {
+      autoRotate = false;
+      targetZoom = THREE.MathUtils.clamp(targetZoom + 0.15, 0.25, 1.65);
+      resumeAutoRotateAt = performance.now() + 1700;
+    });
+
     function openInfo(data) {
       projectMenu.classList.remove("open");
       infoKicker.textContent=data.kicker;
@@ -931,6 +1033,9 @@
     function focusNode(id) {
       const entry=nodes.find(n=>n.data.id===id);
       if(!entry) return;
+
+      autoRotate = false;
+      resumeAutoRotateAt = performance.now() + 1800;
 
       if(mode==="solar"){
         openInfo(entry.data);
@@ -981,6 +1086,8 @@
       targetRotationY=0;
       targetZoom=1;
       focusAnim=null;
+      autoRotate=true;
+      resumeAutoRotateAt=0;
       projectMenu.classList.remove("open");
       infoPanel.classList.remove("open");
       intro.style.opacity="";
@@ -1014,9 +1121,18 @@
           const eu=new THREE.Euler().setFromQuaternion(world.quaternion,"XYZ");
           rotationX=targetRotationX=eu.x;
           rotationY=targetRotationY=eu.y;
+          resumeAutoRotateAt = performance.now() + 900;
           setTimeout(()=>openInfo(data),130);
         }
       }else{
+        if (!dragging && pointers.size === 0 && performance.now() >= resumeAutoRotateAt) {
+          autoRotate = true;
+        }
+
+        if (autoRotate && mode !== "solar") {
+          targetRotationY += AUTO_ROTATE_SPEED;
+        }
+
         rotationX += (targetRotationX-rotationX)*.08;
         rotationY += (targetRotationY-rotationY)*.08;
         world.rotation.set(rotationX,rotationY,0);
