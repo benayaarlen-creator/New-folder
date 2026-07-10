@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#01070b" />
+
   <title>Benaya Arlen | Holographic Globe Portfolio</title>
+
   <meta
     name="description"
     content="Portofolio interaktif Benaya Arlen dalam bentuk globe hologram 3D."
   />
 
-  <!-- Three.js r185 + OrbitControls -->
   <script type="importmap">
     {
       "imports": {
@@ -23,15 +24,12 @@
   <style>
     :root {
       --bg: #01070b;
-      --panel: rgba(3, 21, 30, 0.82);
-      --panel-strong: rgba(2, 13, 20, 0.96);
+      --panel: rgba(2, 15, 23, 0.9);
       --cyan: #58f7ff;
-      --cyan-soft: rgba(88, 247, 255, 0.28);
-      --blue: #208cff;
-      --white: #ebffff;
-      --muted: #8fb8c2;
-      --line: rgba(88, 247, 255, 0.34);
-      --danger: #ff9d5c;
+      --cyan-soft: rgba(88, 247, 255, 0.24);
+      --white: #efffff;
+      --muted: #8eb6c0;
+      --line: rgba(88, 247, 255, 0.3);
     }
 
     * {
@@ -54,15 +52,11 @@
     button,
     a {
       font: inherit;
+      color: inherit;
       -webkit-tap-highlight-color: transparent;
     }
 
-    button {
-      color: inherit;
-    }
-
     a {
-      color: inherit;
       text-decoration: none;
     }
 
@@ -75,43 +69,29 @@
       touch-action: none;
     }
 
-    .noise,
-    .scanlines,
-    .vignette {
+    .vignette,
+    .scanlines {
       position: fixed;
       inset: 0;
       pointer-events: none;
     }
 
-    .noise {
-      z-index: 5;
-      opacity: 0.025;
-      background-image:
-        repeating-radial-gradient(
-          circle at 20% 30%,
-          rgba(255, 255, 255, 0.8) 0 0.5px,
-          transparent 0.8px 3px
-        );
-      background-size: 7px 7px;
+    .vignette {
+      z-index: 3;
+      background:
+        radial-gradient(circle at center, transparent 45%, rgba(0, 3, 6, 0.76) 100%);
     }
 
     .scanlines {
-      z-index: 6;
-      opacity: 0.12;
+      z-index: 4;
+      opacity: 0.1;
       background:
         repeating-linear-gradient(
           to bottom,
           transparent 0,
           transparent 3px,
-          rgba(88, 247, 255, 0.13) 4px
+          rgba(88, 247, 255, 0.12) 4px
         );
-      mix-blend-mode: screen;
-    }
-
-    .vignette {
-      z-index: 4;
-      background:
-        radial-gradient(circle at center, transparent 45%, rgba(0, 3, 6, 0.72) 100%);
     }
 
     .hud-header {
@@ -120,7 +100,7 @@
       left: 0;
       right: 0;
       z-index: 20;
-      min-height: 76px;
+      min-height: 74px;
       padding:
         max(14px, env(safe-area-inset-top))
         max(20px, env(safe-area-inset-right))
@@ -129,16 +109,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
+      gap: 20px;
       background:
-        linear-gradient(to bottom, rgba(1, 7, 11, 0.92), rgba(1, 7, 11, 0));
+        linear-gradient(to bottom, rgba(1, 7, 11, 0.93), rgba(1, 7, 11, 0));
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      letter-spacing: 0.17em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
@@ -155,7 +135,7 @@
       font-weight: 900;
       box-shadow:
         inset 0 0 18px rgba(88, 247, 255, 0.25),
-        0 0 18px rgba(88, 247, 255, 0.3);
+        0 0 18px rgba(88, 247, 255, 0.28);
     }
 
     .brand-mark::before {
@@ -179,8 +159,8 @@
     .brand-copy span {
       margin-top: 4px;
       color: var(--muted);
-      font-size: 0.55rem;
-      letter-spacing: 0.13em;
+      font-size: 0.54rem;
+      letter-spacing: 0.12em;
     }
 
     .status {
@@ -188,9 +168,9 @@
       align-items: center;
       gap: 9px;
       color: var(--muted);
-      font-size: 0.63rem;
+      font-size: 0.61rem;
       font-weight: 800;
-      letter-spacing: 0.13em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
@@ -198,9 +178,9 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #69ffb4;
-      box-shadow: 0 0 12px #69ffb4;
-      animation: blink 1.6s ease-in-out infinite;
+      background: #67ffb2;
+      box-shadow: 0 0 12px #67ffb2;
+      animation: pulse 1.6s ease-in-out infinite;
     }
 
     .intro {
@@ -211,6 +191,7 @@
       width: min(390px, 34vw);
       transform: translateY(-50%);
       pointer-events: none;
+      transition: opacity 220ms ease;
     }
 
     .intro-kicker {
@@ -229,26 +210,26 @@
       letter-spacing: -0.065em;
       text-transform: uppercase;
       text-shadow:
-        0 0 6px rgba(235, 255, 255, 0.65),
-        0 0 23px rgba(88, 247, 255, 0.28);
+        0 0 6px rgba(239, 255, 255, 0.64),
+        0 0 23px rgba(88, 247, 255, 0.26);
     }
 
     .intro h1 span {
       display: block;
       color: transparent;
       -webkit-text-stroke: 1px rgba(88, 247, 255, 0.78);
-      text-shadow: 0 0 20px rgba(88, 247, 255, 0.3);
+      text-shadow: 0 0 20px rgba(88, 247, 255, 0.28);
     }
 
     .intro p {
       margin: 22px 0 0;
       color: var(--muted);
       font-size: 0.9rem;
-      line-height: 1.75;
+      line-height: 1.72;
     }
 
     .guide {
-      margin-top: 25px;
+      margin-top: 24px;
       display: flex;
       flex-wrap: wrap;
       gap: 9px;
@@ -257,9 +238,9 @@
     .guide span {
       padding: 7px 9px;
       border: 1px solid rgba(88, 247, 255, 0.18);
-      color: #7ddde4;
+      color: #7fdfe7;
       background: rgba(88, 247, 255, 0.03);
-      font-size: 0.56rem;
+      font-size: 0.55rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -268,8 +249,8 @@
     .node-label {
       position: fixed;
       z-index: 14;
-      min-width: 120px;
-      max-width: 190px;
+      min-width: 112px;
+      max-width: 185px;
       padding: 9px 11px;
       border: 1px solid rgba(88, 247, 255, 0.38);
       border-radius: 4px;
@@ -282,18 +263,16 @@
         0 0 15px rgba(88, 247, 255, 0.12);
       backdrop-filter: blur(8px);
       transform: translate(-50%, -50%);
-      pointer-events: auto;
+      pointer-events: none;
       cursor: pointer;
       opacity: 0;
       visibility: hidden;
       transition:
         opacity 180ms ease,
-        border-color 180ms ease,
-        transform 180ms ease;
+        border-color 180ms ease;
     }
 
     .node-label.is-visible {
-      opacity: 1;
       visibility: visible;
     }
 
@@ -301,9 +280,6 @@
     .node-label:focus-visible {
       border-color: var(--cyan);
       outline: none;
-      box-shadow:
-        inset 0 0 17px rgba(88, 247, 255, 0.08),
-        0 0 22px rgba(88, 247, 255, 0.28);
     }
 
     .node-label small,
@@ -315,15 +291,14 @@
       color: var(--cyan);
       font-size: 0.5rem;
       font-weight: 900;
-      letter-spacing: 0.13em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .node-label strong {
       margin-top: 4px;
-      font-size: 0.69rem;
-      line-height: 1.25;
-      letter-spacing: 0.02em;
+      font-size: 0.68rem;
+      line-height: 1.24;
       text-transform: uppercase;
     }
 
@@ -338,7 +313,7 @@
       border-radius: 12px;
       background:
         linear-gradient(140deg, rgba(88, 247, 255, 0.08), transparent 45%),
-        rgba(2, 15, 23, 0.82);
+        rgba(2, 15, 23, 0.84);
       box-shadow:
         inset 0 0 24px rgba(88, 247, 255, 0.05),
         0 0 30px rgba(0, 217, 255, 0.1);
@@ -400,10 +375,6 @@
       background: rgba(88, 247, 255, 0.02);
       text-align: left;
       cursor: pointer;
-      transition:
-        color 170ms ease,
-        border-color 170ms ease,
-        background 170ms ease;
     }
 
     .menu-item:hover,
@@ -436,7 +407,7 @@
       border-radius: 17px;
       background:
         linear-gradient(135deg, rgba(88, 247, 255, 0.1), transparent 42%),
-        var(--panel-strong);
+        rgba(2, 15, 23, 0.96);
       box-shadow:
         inset 0 0 30px rgba(88, 247, 255, 0.06),
         0 0 40px rgba(0, 217, 255, 0.22);
@@ -454,17 +425,6 @@
       transform: translate(-50%, 0);
       opacity: 1;
       visibility: visible;
-    }
-
-    .info-panel::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 80px;
-      height: 1px;
-      background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
     }
 
     .info-topline {
@@ -540,32 +500,10 @@
       cursor: pointer;
     }
 
-    .action-button:hover,
-    .action-button:focus-visible {
-      border-color: var(--cyan);
-      background: rgba(88, 247, 255, 0.14);
-      outline: none;
-    }
-
     .action-button.secondary {
       color: var(--muted);
-      border-color: rgba(143, 184, 194, 0.25);
+      border-color: rgba(142, 182, 192, 0.25);
       background: rgba(255, 255, 255, 0.02);
-    }
-
-    .footer-hint {
-      position: fixed;
-      left: 50%;
-      bottom: max(11px, env(safe-area-inset-bottom));
-      z-index: 10;
-      transform: translateX(-50%);
-      color: rgba(143, 184, 194, 0.75);
-      font-size: 0.55rem;
-      font-weight: 800;
-      letter-spacing: 0.13em;
-      text-align: center;
-      text-transform: uppercase;
-      pointer-events: none;
     }
 
     .loading {
@@ -602,7 +540,6 @@
       font-size: 0.8rem;
       font-weight: 900;
       letter-spacing: 0.1em;
-      animation: spinReverse 2.3s linear infinite;
     }
 
     @keyframes spin {
@@ -611,13 +548,7 @@
       }
     }
 
-    @keyframes spinReverse {
-      to {
-        transform: rotate(-360deg);
-      }
-    }
-
-    @keyframes blink {
+    @keyframes pulse {
       50% {
         opacity: 0.35;
       }
@@ -657,17 +588,9 @@
       .menu-panel.is-open {
         transform: translateY(0);
       }
-
-      .info-panel {
-        bottom: max(18px, env(safe-area-inset-bottom));
-      }
     }
 
     @media (max-width: 640px) {
-      .hud-header {
-        min-height: 66px;
-      }
-
       .brand-copy,
       .status span:last-child {
         display: none;
@@ -675,10 +598,6 @@
 
       .intro {
         top: 82px;
-      }
-
-      .intro-kicker {
-        margin-bottom: 8px;
       }
 
       .intro h1 {
@@ -698,7 +617,7 @@
       }
 
       .node-label {
-        min-width: 96px;
+        min-width: 94px;
         max-width: 125px;
         padding: 7px 8px;
       }
@@ -715,10 +634,6 @@
 
       .info-title {
         font-size: clamp(1.65rem, 9vw, 2.8rem);
-      }
-
-      .footer-hint {
-        display: none;
       }
     }
 
@@ -738,7 +653,6 @@
   <canvas id="scene" aria-label="Globe portofolio hologram interaktif"></canvas>
 
   <div class="vignette" aria-hidden="true"></div>
-  <div class="noise" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
   <div class="loading" id="loading">
@@ -775,7 +689,6 @@
     </div>
   </aside>
 
-  <!-- Label HTML diproyeksikan mengikuti posisi titik 3D -->
   <div id="labelsRoot"></div>
 
   <aside class="menu-panel" id="menuPanel" aria-hidden="true">
@@ -802,20 +715,10 @@
     <div class="panel-actions" id="panelActions"></div>
   </section>
 
-  <p class="footer-hint">
-    Drag untuk memutar · Scroll atau pinch untuk zoom · Pilih ikon hologram
-  </p>
-
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-    "use strict";
-
-    /* =========================================================
-       1. DATA NODE
-       Posisi memakai latitude dan longitude seperti titik di bumi.
-       ========================================================= */
     const NODE_DATA = [
       {
         id: "menu",
@@ -840,7 +743,12 @@
         title: "Benaya Arlen",
         description:
           "Software developer dan AI enthusiast yang tertarik pada pengembangan web, aplikasi, antarmuka interaktif, pengolahan data, serta kecerdasan buatan.",
-        tech: ["Web Development", "Artificial Intelligence", "UI Exploration", "Problem Solving"],
+        tech: [
+          "Web Development",
+          "Artificial Intelligence",
+          "UI Exploration",
+          "Problem Solving"
+        ],
         links: [
           {
             label: "GitHub",
@@ -864,7 +772,7 @@
         links: [
           {
             label: "Open",
-            href: "emotion.html"
+            href: "#"
           }
         ]
       },
@@ -952,9 +860,6 @@
       }
     ];
 
-    /* =========================================================
-       2. DOM
-       ========================================================= */
     const canvas = document.getElementById("scene");
     const loading = document.getElementById("loading");
     const labelsRoot = document.getElementById("labelsRoot");
@@ -973,9 +878,6 @@
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /* =========================================================
-       3. THREE.JS DASAR
-       ========================================================= */
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x01070b, 0.055);
 
@@ -994,7 +896,7 @@
       powerPreference: "high-performance"
     });
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x01070b, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1012,14 +914,22 @@
     controls.autoRotate = !reduceMotion;
     controls.autoRotateSpeed = 0.32;
 
-    /* =========================================================
-       4. BINTANG LATAR
-       ========================================================= */
-    function createStars() {
-      const starCount = window.innerWidth < 700 ? 850 : 1450;
-      const positions = new Float32Array(starCount * 3);
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
 
-      for (let i = 0; i < starCount; i += 1) {
+    const globeGroup = new THREE.Group();
+    worldGroup.add(globeGroup);
+
+    const orbitGroup = new THREE.Group();
+    worldGroup.add(orbitGroup);
+
+    const GLOBE_RADIUS = 2.55;
+
+    function createStars() {
+      const count = window.innerWidth < 700 ? 850 : 1450;
+      const positions = new Float32Array(count * 3);
+
+      for (let i = 0; i < count; i += 1) {
         const radius = 18 + Math.random() * 32;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(2 * Math.random() - 1);
@@ -1046,14 +956,6 @@
     const stars = createStars();
     scene.add(stars);
 
-    /* =========================================================
-       5. GLOBE GROUP
-       ========================================================= */
-    const globeGroup = new THREE.Group();
-    scene.add(globeGroup);
-
-    const GLOBE_RADIUS = 2.55;
-
     function randomPointOnSphere(radius) {
       const u = Math.random();
       const v = Math.random();
@@ -1076,10 +978,13 @@
       const colorB = new THREE.Color(0x1c7dff);
 
       for (let i = 0; i < count; i += 1) {
-        const p = randomPointOnSphere(GLOBE_RADIUS + (Math.random() - 0.5) * 0.045);
-        positions[i * 3] = p.x;
-        positions[i * 3 + 1] = p.y;
-        positions[i * 3 + 2] = p.z;
+        const point = randomPointOnSphere(
+          GLOBE_RADIUS + (Math.random() - 0.5) * 0.045
+        );
+
+        positions[i * 3] = point.x;
+        positions[i * 3 + 1] = point.y;
+        positions[i * 3 + 2] = point.z;
 
         const mixed = colorA.clone().lerp(colorB, Math.random() * 0.65);
         colors[i * 3] = mixed.r;
@@ -1132,9 +1037,6 @@
     );
     globeGroup.add(outerGlow);
 
-    /* =========================================================
-       6. GARIS LINTANG DAN BUJUR
-       ========================================================= */
     function createLatitudeRing(latitude) {
       const latRad = THREE.MathUtils.degToRad(latitude);
       const ringRadius = GLOBE_RADIUS * Math.cos(latRad);
@@ -1174,6 +1076,7 @@
 
       for (let i = 0; i <= 160; i += 1) {
         const latitude = -Math.PI / 2 + (i / 160) * Math.PI;
+
         points.push(
           new THREE.Vector3(
             GLOBE_RADIUS * Math.cos(latitude) * Math.cos(lonRad),
@@ -1199,61 +1102,58 @@
       globeGroup.add(createLongitudeRing(longitude));
     }
 
-/* =========================================================
-   7. CINCIN ORBIT
-   ========================================================= */
-function createOrbit(radius, opacity, rotation) {
-  const points = [];
+    function createOrbit(radius, opacity, rotation) {
+      const points = [];
 
-  for (let i = 0; i <= 200; i += 1) {
-    const angle = (i / 200) * Math.PI * 2;
+      for (let i = 0; i <= 200; i += 1) {
+        const angle = (i / 200) * Math.PI * 2;
 
-    points.push(
-      new THREE.Vector3(
-        radius * Math.cos(angle),
+        points.push(
+          new THREE.Vector3(
+            radius * Math.cos(angle),
+            0,
+            radius * Math.sin(angle)
+          )
+        );
+      }
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({
+        color: 0x45f4ff,
+        transparent: true,
+        opacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      const line = new THREE.LineLoop(geometry, material);
+      line.rotation.set(...rotation);
+
+      return line;
+    }
+
+    const orbitA = createOrbit(
+      GLOBE_RADIUS * 1.3,
+      0.22,
+      [
+        THREE.MathUtils.degToRad(67),
         0,
-        radius * Math.sin(angle)
-      )
+        THREE.MathUtils.degToRad(12)
+      ]
     );
-  }
 
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const orbitB = createOrbit(
+      GLOBE_RADIUS * 1.43,
+      0.14,
+      [
+        THREE.MathUtils.degToRad(28),
+        THREE.MathUtils.degToRad(65),
+        THREE.MathUtils.degToRad(-18)
+      ]
+    );
 
-  const material = new THREE.LineBasicMaterial({
-    color: 0x45f4ff,
-    transparent: true,
-    opacity,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
+    orbitGroup.add(orbitA, orbitB);
 
-  const line = new THREE.LineLoop(geometry, material);
-  line.rotation.set(...rotation);
-
-  return line;
-}
-
-const orbitA = createOrbit(
-  GLOBE_RADIUS * 1.3,
-  0.22,
-  [THREE.MathUtils.degToRad(67), 0, THREE.MathUtils.degToRad(12)]
-);
-
-const orbitB = createOrbit(
-  GLOBE_RADIUS * 1.43,
-  0.14,
-  [
-    THREE.MathUtils.degToRad(28),
-    THREE.MathUtils.degToRad(65),
-    THREE.MathUtils.degToRad(-18)
-  ]
-);
-
-globeGroup.add(orbitA, orbitB);
-
-    /* =========================================================
-       8. NODE ICONS
-       ========================================================= */
     function latLonToVector3(latitude, longitude, radius = GLOBE_RADIUS) {
       const lat = THREE.MathUtils.degToRad(latitude);
       const lon = THREE.MathUtils.degToRad(longitude);
@@ -1270,11 +1170,10 @@ globeGroup.add(orbitA, orbitB);
       const iconCanvas = document.createElement("canvas");
       iconCanvas.width = size;
       iconCanvas.height = size;
-      const ctx = iconCanvas.getContext("2d");
 
-      ctx.clearRect(0, 0, size, size);
+      const context = iconCanvas.getContext("2d");
 
-      const gradient = ctx.createRadialGradient(
+      const gradient = context.createRadialGradient(
         size / 2,
         size / 2,
         10,
@@ -1282,36 +1181,40 @@ globeGroup.add(orbitA, orbitB);
         size / 2,
         size / 2
       );
+
       gradient.addColorStop(0, "rgba(235,255,255,0.96)");
       gradient.addColorStop(0.16, "rgba(88,247,255,0.5)");
       gradient.addColorStop(0.55, "rgba(0,217,255,0.10)");
       gradient.addColorStop(1, "rgba(0,217,255,0)");
 
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, size, size);
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, size, size);
 
-      ctx.beginPath();
-      ctx.arc(size / 2, size / 2, 78, 0, Math.PI * 2);
-      ctx.fillStyle = isSystem
-        ? "rgba(5, 35, 47, 0.90)"
-        : "rgba(3, 25, 37, 0.90)";
-      ctx.fill();
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = "rgba(88,247,255,0.95)";
-      ctx.shadowColor = "#58f7ff";
-      ctx.shadowBlur = 20;
-      ctx.stroke();
+      context.beginPath();
+      context.arc(size / 2, size / 2, 78, 0, Math.PI * 2);
+      context.fillStyle = isSystem
+        ? "rgba(5,35,47,0.90)"
+        : "rgba(3,25,37,0.90)";
+      context.fill();
 
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = "#eaffff";
-      ctx.font = `900 ${text.length > 1 ? 54 : 78}px system-ui, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(text, size / 2, size / 2 + 2);
+      context.lineWidth = 5;
+      context.strokeStyle = "rgba(88,247,255,0.95)";
+      context.shadowColor = "#58f7ff";
+      context.shadowBlur = 20;
+      context.stroke();
+
+      context.shadowBlur = 14;
+      context.fillStyle = "#eaffff";
+      context.font =
+        `900 ${text.length > 1 ? 54 : 78}px system-ui, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(text, size / 2, size / 2 + 2);
 
       const texture = new THREE.CanvasTexture(iconCanvas);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.needsUpdate = true;
+
       return texture;
     }
 
@@ -1321,18 +1224,23 @@ globeGroup.add(orbitA, orbitB);
     NODE_DATA.forEach((data) => {
       const anchor = new THREE.Group();
       anchor.position.copy(
-        latLonToVector3(data.latitude, data.longitude, GLOBE_RADIUS + 0.11)
+        latLonToVector3(
+          data.latitude,
+          data.longitude,
+          GLOBE_RADIUS + 0.11
+        )
       );
       anchor.userData = data;
 
-      const stemDirection = anchor.position.clone().normalize();
-      const stemStart = stemDirection.clone().multiplyScalar(GLOBE_RADIUS);
-      const stemEnd = stemDirection.clone().multiplyScalar(GLOBE_RADIUS + 0.27);
+      const direction = anchor.position.clone().normalize();
+      const stemStart = direction.clone().multiplyScalar(GLOBE_RADIUS);
+      const stemEnd = direction.clone().multiplyScalar(GLOBE_RADIUS + 0.27);
 
       const stemGeometry = new THREE.BufferGeometry().setFromPoints([
         stemStart,
         stemEnd
       ]);
+
       const stem = new THREE.Line(
         stemGeometry,
         new THREE.LineBasicMaterial({
@@ -1343,6 +1251,7 @@ globeGroup.add(orbitA, orbitB);
           depthWrite: false
         })
       );
+
       globeGroup.add(stem);
 
       const pulse = new THREE.Mesh(
@@ -1356,7 +1265,6 @@ globeGroup.add(orbitA, orbitB);
           depthWrite: false
         })
       );
-      pulse.userData.isPulse = true;
 
       const sprite = new THREE.Sprite(
         new THREE.SpriteMaterial({
@@ -1366,6 +1274,7 @@ globeGroup.add(orbitA, orbitB);
           blending: THREE.AdditiveBlending
         })
       );
+
       sprite.scale.setScalar(data.type === "system" ? 0.62 : 0.55);
       sprite.userData = data;
 
@@ -1384,19 +1293,26 @@ globeGroup.add(orbitA, orbitB);
       label.addEventListener("click", () => selectNode(data.id));
       labelsRoot.appendChild(label);
 
-      nodeObjects.push({ data, anchor, pulse, sprite, label });
+      nodeObjects.push({
+        data,
+        anchor,
+        pulse,
+        sprite,
+        label
+      });
+
       raycastTargets.push(sprite);
     });
 
-    /* =========================================================
-       9. RAYCASTER
-       ========================================================= */
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     let pointerDown = { x: 0, y: 0 };
 
     renderer.domElement.addEventListener("pointerdown", (event) => {
-      pointerDown = { x: event.clientX, y: event.clientY };
+      pointerDown = {
+        x: event.clientX,
+        y: event.clientY
+      };
     });
 
     renderer.domElement.addEventListener("pointerup", (event) => {
@@ -1405,23 +1321,28 @@ globeGroup.add(orbitA, orbitB);
         event.clientY - pointerDown.y
       );
 
-      if (moved > 8) return;
+      if (moved > 8) {
+        return;
+      }
 
       pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
       pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(pointer, camera);
-      const intersections = raycaster.intersectObjects(raycastTargets, false);
+
+      const intersections = raycaster.intersectObjects(
+        raycastTargets,
+        false
+      );
 
       if (intersections.length > 0) {
         selectNode(intersections[0].object.userData.id);
       }
     });
 
-    /* =========================================================
-       10. MENU DAN PANEL
-       ========================================================= */
-    const projectNodes = NODE_DATA.filter((node) => node.type === "project");
+    const projectNodes = NODE_DATA.filter(
+      (node) => node.type === "project"
+    );
 
     projectNodes.forEach((project) => {
       const button = document.createElement("button");
@@ -1431,15 +1352,18 @@ globeGroup.add(orbitA, orbitB);
         <span>${project.title}</span>
         <span>◎</span>
       `;
+
       button.addEventListener("click", () => {
         closeMenuPanel();
         focusNode(project.id, true);
       });
+
       menuList.appendChild(button);
     });
 
     function openMenuPanel() {
       closeInfoPanel();
+
       menuPanel.classList.add("is-open");
       menuPanel.setAttribute("aria-hidden", "false");
 
@@ -1474,29 +1398,30 @@ globeGroup.add(orbitA, orbitB);
         })
       );
 
-      panelActions.replaceChildren(
-        ...((data.links || []).map((link) => {
-          const anchor = document.createElement("a");
-          anchor.className = "action-button";
-          anchor.href = link.href;
-          anchor.textContent = link.label;
+      const actions = [];
 
-          if (link.external) {
-            anchor.target = "_blank";
-            anchor.rel = "noopener noreferrer";
-          }
+      (data.links || []).forEach((link) => {
+        const anchor = document.createElement("a");
+        anchor.className = "action-button";
+        anchor.href = link.href;
+        anchor.textContent = link.label;
 
-          return anchor;
-        })),
-        (() => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "action-button secondary";
-          button.textContent = "Kembali ke Globe";
-          button.addEventListener("click", closeInfoPanel);
-          return button;
-        })()
-      );
+        if (link.external) {
+          anchor.target = "_blank";
+          anchor.rel = "noopener noreferrer";
+        }
+
+        actions.push(anchor);
+      });
+
+      const closeButton = document.createElement("button");
+      closeButton.type = "button";
+      closeButton.className = "action-button secondary";
+      closeButton.textContent = "Kembali ke Globe";
+      closeButton.addEventListener("click", closeInfoPanel);
+      actions.push(closeButton);
+
+      panelActions.replaceChildren(...actions);
 
       infoPanel.classList.add("is-open");
       infoPanel.setAttribute("aria-hidden", "false");
@@ -1512,58 +1437,66 @@ globeGroup.add(orbitA, orbitB);
     closeMenu.addEventListener("click", closeMenuPanel);
     closeInfo.addEventListener("click", closeInfoPanel);
 
-    /* =========================================================
-       11. ANIMASI FOKUS NODE
-       Globe diputar agar titik terpilih menghadap kamera.
-       ========================================================= */
     let focusAnimation = null;
 
-    function easeInOutCubic(t) {
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    function easeInOutCubic(value) {
+      return value < 0.5
+        ? 4 * value * value * value
+        : 1 - Math.pow(-2 * value + 2, 3) / 2;
     }
 
     function focusNode(nodeId, openAfterFocus = true) {
       const entry = nodeObjects.find(({ data }) => data.id === nodeId);
-      if (!entry) return;
+
+      if (!entry) {
+        return;
+      }
 
       controls.autoRotate = false;
 
       const worldPosition = new THREE.Vector3();
       entry.anchor.getWorldPosition(worldPosition);
 
+      const currentDirection = worldPosition
+        .clone()
+        .sub(worldGroup.position)
+        .normalize();
+
       const targetDirection = new THREE.Vector3(0, 0, 1);
-      const currentDirection = worldPosition.clone().normalize();
 
       const deltaQuaternion = new THREE.Quaternion().setFromUnitVectors(
         currentDirection,
         targetDirection
       );
 
-      const startQuaternion = globeGroup.quaternion.clone();
-      const endQuaternion = deltaQuaternion.multiply(startQuaternion).normalize();
-      const startTime = performance.now();
-      const duration = reduceMotion ? 1 : 1050;
+      const startQuaternion = worldGroup.quaternion.clone();
+      const endQuaternion = deltaQuaternion
+        .multiply(startQuaternion)
+        .normalize();
 
       focusAnimation = {
         startQuaternion,
         endQuaternion,
-        startTime,
-        duration,
+        startTime: performance.now(),
+        duration: reduceMotion ? 1 : 1050,
         data: entry.data,
         openAfterFocus
       };
     }
 
     function updateFocusAnimation(now) {
-      if (!focusAnimation) return;
+      if (!focusAnimation) {
+        return;
+      }
 
       const elapsed = now - focusAnimation.startTime;
-      const progress = Math.min(1, elapsed / focusAnimation.duration);
+      const progress = Math.min(
+        1,
+        elapsed / focusAnimation.duration
+      );
       const eased = easeInOutCubic(progress);
 
-      globeGroup.quaternion.slerpQuaternions(
+      worldGroup.quaternion.slerpQuaternions(
         focusAnimation.startQuaternion,
         focusAnimation.endQuaternion,
         eased
@@ -1583,11 +1516,19 @@ globeGroup.add(orbitA, orbitB);
 
     function selectNode(nodeId) {
       const data = NODE_DATA.find((node) => node.id === nodeId);
-      if (!data) return;
+
+      if (!data) {
+        return;
+      }
 
       if (nodeId === "menu") {
         focusNode(nodeId, false);
-        window.setTimeout(openMenuPanel, reduceMotion ? 0 : 700);
+
+        window.setTimeout(
+          openMenuPanel,
+          reduceMotion ? 0 : 700
+        );
+
         return;
       }
 
@@ -1596,48 +1537,53 @@ globeGroup.add(orbitA, orbitB);
 
     homeButton.addEventListener("click", (event) => {
       event.preventDefault();
+
       closeMenuPanel();
       closeInfoPanel();
+
       controls.autoRotate = !reduceMotion;
 
-      const startQuaternion = globeGroup.quaternion.clone();
-      const endQuaternion = new THREE.Quaternion();
-      const startTime = performance.now();
-
       focusAnimation = {
-        startQuaternion,
-        endQuaternion,
-        startTime,
+        startQuaternion: worldGroup.quaternion.clone(),
+        endQuaternion: new THREE.Quaternion(),
+        startTime: performance.now(),
         duration: reduceMotion ? 1 : 900,
         data: NODE_DATA[0],
         openAfterFocus: false
       };
 
       camera.position.set(0, 0.3, 8.7);
-      controls.target.set(0, 0, 0);
+      controls.target.copy(worldGroup.position);
     });
 
-    /* =========================================================
-       12. PROYEKSI LABEL HTML
-       ========================================================= */
     const tempWorld = new THREE.Vector3();
     const tempProjected = new THREE.Vector3();
-    const cameraDirection = new THREE.Vector3();
 
     function updateNodeLabels() {
-      camera.getWorldDirection(cameraDirection);
-
-      nodeObjects.forEach(({ data, anchor, label }) => {
+      nodeObjects.forEach(({ anchor, label }) => {
         anchor.getWorldPosition(tempWorld);
 
-        const normal = tempWorld.clone().normalize();
-        const directionToCamera = camera.position.clone().sub(tempWorld).normalize();
+        const globeCenter = new THREE.Vector3();
+        worldGroup.getWorldPosition(globeCenter);
+
+        const normal = tempWorld
+          .clone()
+          .sub(globeCenter)
+          .normalize();
+
+        const directionToCamera = camera.position
+          .clone()
+          .sub(tempWorld)
+          .normalize();
+
         const facing = normal.dot(directionToCamera);
 
         tempProjected.copy(tempWorld).project(camera);
 
-        const x = (tempProjected.x * 0.5 + 0.5) * window.innerWidth;
-        const y = (-tempProjected.y * 0.5 + 0.5) * window.innerHeight;
+        const x =
+          (tempProjected.x * 0.5 + 0.5) * window.innerWidth;
+        const y =
+          (-tempProjected.y * 0.5 + 0.5) * window.innerHeight;
 
         label.style.left = `${x}px`;
         label.style.top = `${y - 45}px`;
@@ -1650,36 +1596,31 @@ globeGroup.add(orbitA, orbitB);
         label.style.opacity = shouldShow
           ? String(Math.min(1, 0.45 + facing))
           : "0";
-        label.style.pointerEvents = shouldShow ? "auto" : "none";
+
+        label.style.pointerEvents = shouldShow
+          ? "auto"
+          : "none";
       });
     }
 
-    /* =========================================================
-       13. RESPONSIVE
-       ========================================================= */
     function updateResponsiveLayout() {
-      const isTablet = window.innerWidth <= 980;
-      const isPhone = window.innerWidth <= 640;
-
-      if (isPhone) {
-        globeGroup.position.set(0, -0.65, 0);
+      if (window.innerWidth <= 640) {
+        worldGroup.position.set(0, -0.65, 0);
         camera.position.z = 9.7;
-      } else if (isTablet) {
-        globeGroup.position.set(0, -0.6, 0);
+      } else if (window.innerWidth <= 980) {
+        worldGroup.position.set(0, -0.6, 0);
         camera.position.z = 9.1;
       } else {
-        globeGroup.position.set(1.85, 0, 0);
+        worldGroup.position.set(1.85, 0, 0);
         camera.position.z = 8.7;
       }
 
+      controls.target.copy(worldGroup.position);
       controls.update();
     }
 
     updateResponsiveLayout();
 
-    /* =========================================================
-       14. ANIMATION LOOP
-       ========================================================= */
     const clock = new THREE.Clock();
 
     function animate(now) {
@@ -1689,17 +1630,23 @@ globeGroup.add(orbitA, orbitB);
       updateFocusAnimation(now);
 
       globePoints.rotation.y += reduceMotion ? 0 : 0.00065;
-      sphereGlow.scale.setScalar(1 + Math.sin(elapsed * 1.8) * 0.006);
-      outerGlow.scale.setScalar(1 + Math.sin(elapsed * 1.2) * 0.012);
+      sphereGlow.scale.setScalar(
+        1 + Math.sin(elapsed * 1.8) * 0.006
+      );
+      outerGlow.scale.setScalar(
+        1 + Math.sin(elapsed * 1.2) * 0.012
+      );
 
       orbitA.rotation.z += reduceMotion ? 0 : 0.0009;
-      orbitB.rotation.y -= reduceMotion ? 0 : 0.0009;
-      stars.rotation.y += reduceMotion ? 0 : 0.00007;
+      orbitB.rotation.y -= reduceMotion ? 0 : 0.0007;
+      stars.rotation.y += reduceMotion ? 0 : 0.00008;
 
       nodeObjects.forEach(({ pulse, sprite }, index) => {
         const pulseScale =
           1 + Math.sin(elapsed * 2.4 + index * 0.8) * 0.22;
+
         pulse.scale.setScalar(pulseScale);
+
         pulse.material.opacity =
           0.42 + Math.sin(elapsed * 2.4 + index) * 0.18;
 
@@ -1717,28 +1664,30 @@ globeGroup.add(orbitA, orbitB);
 
     requestAnimationFrame(animate);
 
-    /* =========================================================
-       15. RESIZE
-       ========================================================= */
     let resizeTimer;
 
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
 
       resizeTimer = window.setTimeout(() => {
-        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.aspect =
+          window.innerWidth / window.innerHeight;
+
         camera.updateProjectionMatrix();
 
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(
+          Math.min(window.devicePixelRatio || 1, 1.75)
+        );
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
 
         updateResponsiveLayout();
       }, 100);
     });
 
-    /* =========================================================
-       16. LOADING SELESAI
-       ========================================================= */
     window.setTimeout(() => {
       loading.classList.add("is-hidden");
     }, 700);
