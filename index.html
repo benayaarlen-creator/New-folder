@@ -717,8 +717,6 @@
 
   <script type="module">
     import * as THREE from "three";
-    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
     const NODE_DATA = [
       {
         id: "menu",
@@ -901,18 +899,27 @@
     renderer.setClearColor(0x01070b, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.055;
-    controls.enablePan = false;
-    controls.enableZoom = true;
-    controls.rotateSpeed = 0.58;
-    controls.zoomSpeed = 0.7;
-    controls.minDistance = 5.7;
-    controls.maxDistance = 12;
-    controls.target.set(0, 0, 0);
-    controls.autoRotate = !reduceMotion;
-    controls.autoRotateSpeed = 0.32;
+    /*
+      KONTROL KHUSUS:
+      Kamera tetap diam. Yang diputar adalah worldGroup sehingga globe
+      tidak berpindah posisi pada layar ketika digeser atau di-scroll.
+    */
+    let rotationX = 0;
+    let rotationY = 0;
+    let targetRotationX = 0;
+    let targetRotationY = 0;
+
+    let globeScale = 1;
+    let targetGlobeScale = 1;
+
+    let isDragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+    let dragDistance = 0;
+
+    let activePointers = new Map();
+    let previousPinchDistance = 0;
+    let autoRotateEnabled = !reduceMotion;
 
     const worldGroup = new THREE.Group();
     scene.add(worldGroup);
@@ -1306,22 +1313,105 @@
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
-    let pointerDown = { x: 0, y: 0 };
+
+    function getPointerDistance() {
+      const points = [...activePointers.values()];
+
+      if (points.length < 2) {
+        return 0;
+      }
+
+      return Math.hypot(
+        points[0].x - points[1].x,
+        points[0].y - points[1].y
+      );
+    }
 
     renderer.domElement.addEventListener("pointerdown", (event) => {
-      pointerDown = {
+      renderer.domElement.setPointerCapture(event.pointerId);
+
+      activePointers.set(event.pointerId, {
         x: event.clientX,
         y: event.clientY
-      };
+      });
+
+      isDragging = true;
+      autoRotateEnabled = false;
+      lastPointerX = event.clientX;
+      lastPointerY = event.clientY;
+      dragDistance = 0;
+
+      if (activePointers.size === 2) {
+        previousPinchDistance = getPointerDistance();
+      }
     });
 
-    renderer.domElement.addEventListener("pointerup", (event) => {
-      const moved = Math.hypot(
-        event.clientX - pointerDown.x,
-        event.clientY - pointerDown.y
+    renderer.domElement.addEventListener("pointermove", (event) => {
+      if (!activePointers.has(event.pointerId)) {
+        return;
+      }
+
+      activePointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY
+      });
+
+      if (activePointers.size === 2) {
+        const pinchDistance = getPointerDistance();
+
+        if (previousPinchDistance > 0) {
+          const difference = pinchDistance - previousPinchDistance;
+          targetGlobeScale += difference * 0.0025;
+          targetGlobeScale = THREE.MathUtils.clamp(
+            targetGlobeScale,
+            0.72,
+            1.35
+          );
+        }
+
+        previousPinchDistance = pinchDistance;
+        return;
+      }
+
+      if (!isDragging) {
+        return;
+      }
+
+      const deltaX = event.clientX - lastPointerX;
+      const deltaY = event.clientY - lastPointerY;
+
+      dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
+      targetRotationY += deltaX * 0.0065;
+      targetRotationX += deltaY * 0.005;
+      targetRotationX = THREE.MathUtils.clamp(
+        targetRotationX,
+        -Math.PI * 0.46,
+        Math.PI * 0.46
       );
 
-      if (moved > 8) {
+      lastPointerX = event.clientX;
+      lastPointerY = event.clientY;
+    });
+
+    function finishPointer(event) {
+      const wasTap = dragDistance < 10 && activePointers.size <= 1;
+
+      activePointers.delete(event.pointerId);
+
+      if (
+        renderer.domElement.hasPointerCapture &&
+        renderer.domElement.hasPointerCapture(event.pointerId)
+      ) {
+        renderer.domElement.releasePointerCapture(event.pointerId);
+      }
+
+      if (activePointers.size === 0) {
+        isDragging = false;
+        previousPinchDistance = 0;
+      }
+
+      if (!wasTap) {
         return;
       }
 
@@ -1338,7 +1428,48 @@
       if (intersections.length > 0) {
         selectNode(intersections[0].object.userData.id);
       }
+    }
+
+    renderer.domElement.addEventListener("pointerup", finishPointer);
+    renderer.domElement.addEventListener("pointercancel", (event) => {
+      activePointers.delete(event.pointerId);
+
+      if (activePointers.size === 0) {
+        isDragging = false;
+        previousPinchDistance = 0;
+      }
     });
+
+    /*
+      Scroll tidak lagi menggerakkan kamera.
+      Scroll vertikal memutar globe secara horizontal.
+      Ctrl/trackpad pinch mengubah ukuran globe.
+    */
+    renderer.domElement.addEventListener(
+      "wheel",
+      (event) => {
+        event.preventDefault();
+        autoRotateEnabled = false;
+
+        if (event.ctrlKey) {
+          targetGlobeScale -= event.deltaY * 0.0012;
+          targetGlobeScale = THREE.MathUtils.clamp(
+            targetGlobeScale,
+            0.72,
+            1.35
+          );
+        } else {
+          targetRotationY += event.deltaY * 0.0025;
+          targetRotationX += event.deltaX * 0.0015;
+          targetRotationX = THREE.MathUtils.clamp(
+            targetRotationX,
+            -Math.PI * 0.46,
+            Math.PI * 0.46
+          );
+        }
+      },
+      { passive: false }
+    );
 
     const projectNodes = NODE_DATA.filter(
       (node) => node.type === "project"
@@ -1445,6 +1576,10 @@
         : 1 - Math.pow(-2 * value + 2, 3) / 2;
     }
 
+    /*
+      Menghitung rotasi globe agar node menghadap ke kamera.
+      Kamera dan posisi worldGroup tidak berubah.
+    */
     function focusNode(nodeId, openAfterFocus = true) {
       const entry = nodeObjects.find(({ data }) => data.id === nodeId);
 
@@ -1452,36 +1587,33 @@
         return;
       }
 
-      controls.autoRotate = false;
+      autoRotateEnabled = false;
 
-      const worldPosition = new THREE.Vector3();
-      entry.anchor.getWorldPosition(worldPosition);
+      const localPosition = entry.anchor.position.clone().normalize();
 
-      const currentDirection = worldPosition
-        .clone()
-        .sub(worldGroup.position)
-        .normalize();
-
-      const targetDirection = new THREE.Vector3(0, 0, 1);
-
-      const deltaQuaternion = new THREE.Quaternion().setFromUnitVectors(
-        currentDirection,
-        targetDirection
+      const desiredY = Math.atan2(localPosition.x, localPosition.z);
+      const horizontalLength = Math.hypot(
+        localPosition.x,
+        localPosition.z
+      );
+      const desiredX = -Math.atan2(
+        localPosition.y,
+        horizontalLength
       );
 
-      const startQuaternion = worldGroup.quaternion.clone();
-      const endQuaternion = deltaQuaternion
-        .multiply(startQuaternion)
-        .normalize();
-
       focusAnimation = {
-        startQuaternion,
-        endQuaternion,
+        startX: rotationX,
+        startY: rotationY,
+        endX: desiredX,
+        endY: desiredY,
         startTime: performance.now(),
-        duration: reduceMotion ? 1 : 1050,
+        duration: reduceMotion ? 1 : 1000,
         data: entry.data,
         openAfterFocus
       };
+
+      targetRotationX = desiredX;
+      targetRotationY = desiredY;
     }
 
     function updateFocusAnimation(now) {
@@ -1496,20 +1628,35 @@
       );
       const eased = easeInOutCubic(progress);
 
-      worldGroup.quaternion.slerpQuaternions(
-        focusAnimation.startQuaternion,
-        focusAnimation.endQuaternion,
+      rotationX = THREE.MathUtils.lerp(
+        focusAnimation.startX,
+        focusAnimation.endX,
         eased
       );
+
+      rotationY = THREE.MathUtils.lerp(
+        focusAnimation.startY,
+        focusAnimation.endY,
+        eased
+      );
+
+      globeScale += (targetGlobeScale - globeScale) * 0.09;
+
+      worldGroup.rotation.x = rotationX;
+      worldGroup.rotation.y = rotationY;
+      worldGroup.scale.setScalar(globeScale);
 
       if (progress >= 1) {
         const completed = focusAnimation;
         focusAnimation = null;
 
+        targetRotationX = rotationX;
+        targetRotationY = rotationY;
+
         if (completed.openAfterFocus) {
           window.setTimeout(() => {
             openInfoPanel(completed.data);
-          }, reduceMotion ? 0 : 180);
+          }, reduceMotion ? 0 : 160);
         }
       }
     }
@@ -1541,19 +1688,12 @@
       closeMenuPanel();
       closeInfoPanel();
 
-      controls.autoRotate = !reduceMotion;
+      autoRotateEnabled = !reduceMotion;
+      focusAnimation = null;
 
-      focusAnimation = {
-        startQuaternion: worldGroup.quaternion.clone(),
-        endQuaternion: new THREE.Quaternion(),
-        startTime: performance.now(),
-        duration: reduceMotion ? 1 : 900,
-        data: NODE_DATA[0],
-        openAfterFocus: false
-      };
-
-      camera.position.set(0, 0.3, 8.7);
-      controls.target.copy(worldGroup.position);
+      targetRotationX = 0;
+      targetRotationY = 0;
+      targetGlobeScale = 1;
     });
 
     const tempWorld = new THREE.Vector3();
@@ -1615,8 +1755,6 @@
         camera.position.z = 8.7;
       }
 
-      controls.target.copy(worldGroup.position);
-      controls.update();
     }
 
     updateResponsiveLayout();
@@ -1626,8 +1764,21 @@
     function animate(now) {
       const elapsed = clock.getElapsedTime();
 
-      controls.update();
       updateFocusAnimation(now);
+
+      if (!focusAnimation) {
+        if (autoRotateEnabled && !isDragging && activePointers.size === 0) {
+          targetRotationY += 0.0013;
+        }
+
+        rotationX += (targetRotationX - rotationX) * 0.085;
+        rotationY += (targetRotationY - rotationY) * 0.085;
+        globeScale += (targetGlobeScale - globeScale) * 0.09;
+
+        worldGroup.rotation.x = rotationX;
+        worldGroup.rotation.y = rotationY;
+        worldGroup.scale.setScalar(globeScale);
+      }
 
       globePoints.rotation.y += reduceMotion ? 0 : 0.00065;
       sphereGlow.scale.setScalar(
