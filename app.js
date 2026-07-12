@@ -348,6 +348,9 @@ const pointers = new Map();
 let previousPinchDistance = 0;
 
 let focusAnimation = null;
+let selectedNodeId = null;
+let focusLocked = false;
+
 let autoRotate = true;
 let resumeAutoRotateAt = 0;
 
@@ -424,6 +427,10 @@ function getPinchDistance() {
 }
 
 canvas.addEventListener("pointerdown", (event) => {
+  if (infoPanel.classList.contains("open")) {
+    return;
+  }
+
   canvas.setPointerCapture(event.pointerId);
 
   pointers.set(event.pointerId, {
@@ -609,6 +616,11 @@ zoomInButton.addEventListener("click", () => {
 });
 
 function openInfo(data) {
+  selectedNodeId = data.id;
+  focusLocked = true;
+  autoRotate = false;
+  resumeAutoRotateAt = Number.POSITIVE_INFINITY;
+
   projectMenu.classList.remove("open");
   projectMenu.setAttribute("aria-hidden", "true");
 
@@ -657,6 +669,11 @@ function openInfo(data) {
 function closeInfo() {
   infoPanel.classList.remove("open");
   infoPanel.setAttribute("aria-hidden", "true");
+
+  focusLocked = false;
+  selectedNodeId = null;
+  autoRotate = false;
+  resumeAutoRotateAt = performance.now() + 900;
 }
 
 function showMenu() {
@@ -682,8 +699,10 @@ function focusNode(id) {
     return;
   }
 
+  selectedNodeId = entry.data.id;
+  focusLocked = true;
   autoRotate = false;
-  resumeAutoRotateAt = performance.now() + 1500;
+  resumeAutoRotateAt = Number.POSITIVE_INFINITY;
 
   const systemCenter = new THREE.Vector3();
   systemRoot.getWorldPosition(systemCenter);
@@ -765,6 +784,8 @@ document
     targetRotationY = 0;
 
     focusAnimation = null;
+    selectedNodeId = null;
+    focusLocked = false;
     globeQuaternion.identity();
 
     autoRotate = true;
@@ -820,10 +841,26 @@ function animate(now) {
 
     if (progress >= 1) {
       const data = focusAnimation.data;
-      focusAnimation = null;
 
-      resumeAutoRotateAt =
-        performance.now() + 1000;
+      /*
+        Simpan rotasi akhir hasil quaternion ke rotationX/rotationY.
+        Tanpa ini, frame berikutnya akan memakai rotasi lama dan globe
+        meloncat kembali sehingga node keluar dari tengah.
+      */
+      const finalEuler = new THREE.Euler().setFromQuaternion(
+        globeQuaternion,
+        "XYZ"
+      );
+
+      rotationX = finalEuler.x;
+      rotationY = finalEuler.y;
+      targetRotationX = rotationX;
+      targetRotationY = rotationY;
+
+      focusAnimation = null;
+      focusLocked = true;
+      autoRotate = false;
+      resumeAutoRotateAt = Number.POSITIVE_INFINITY;
 
       window.setTimeout(() => {
         openInfo(data);
@@ -831,6 +868,8 @@ function animate(now) {
     }
   } else {
     if (
+      !focusLocked &&
+      !infoPanel.classList.contains("open") &&
       !dragging &&
       pointers.size === 0 &&
       performance.now() >= resumeAutoRotateAt
@@ -838,7 +877,12 @@ function animate(now) {
       autoRotate = true;
     }
 
-    if (autoRotate && weights.globe > 0.35) {
+    if (
+      autoRotate &&
+      !focusLocked &&
+      !infoPanel.classList.contains("open") &&
+      weights.globe > 0.35
+    ) {
       targetRotationY += 0.00105;
     }
 
@@ -939,11 +983,40 @@ function animate(now) {
       weights.universe * universeBoost +
       weights.dataSpace * 0.2;
 
+    const selectedBoost =
+      node.data.id === selectedNodeId
+        ? 1.34
+        : 1;
+
     node.miniGlobe.scale.setScalar(
       (node.data.importance || 1) *
       modeScale *
-      portraitFactor
+      portraitFactor *
+      selectedBoost
     );
+
+    const selectedOpacity =
+      node.data.id === selectedNodeId
+        ? 1
+        : 0.86;
+
+    node.miniGlobe.userData.pointSphere.material.opacity =
+      selectedOpacity;
+
+    node.miniGlobe.userData.icon.material.opacity =
+      node.data.id === selectedNodeId
+        ? 1
+        : 0.9;
+
+    node.miniGlobe.userData.ringA.material.opacity =
+      node.data.id === selectedNodeId
+        ? 0.78
+        : 0.46;
+
+    node.miniGlobe.userData.ringB.material.opacity =
+      node.data.id === selectedNodeId
+        ? 0.5
+        : 0.24;
 
     node.miniGlobe.userData.pointSphere.rotation.y +=
       0.007 + index * 0.0007;
