@@ -28,7 +28,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(0, 0.3, 8.7);
+camera.position.set(0, 0.25, 8.7);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -40,20 +40,17 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x01070b);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const world = new THREE.Group();
-scene.add(world);
+const systemRoot = new THREE.Group();
+scene.add(systemRoot);
 
-const mainGlobe = new THREE.Group();
-world.add(mainGlobe);
+const globeBody = new THREE.Group();
+systemRoot.add(globeBody);
 
-const universeGroup = new THREE.Group();
-world.add(universeGroup);
-
-const dataSpaceGroup = new THREE.Group();
-world.add(dataSpaceGroup);
+const nodeLayer = new THREE.Group();
+systemRoot.add(nodeLayer);
 
 const GLOBE_RADIUS = 2.55;
-const zAxis = new THREE.Vector3(0, 0, 1);
+const FORWARD = new THREE.Vector3(0, 0, 1);
 
 function createPointSphere(radius, count, size, opacity = 0.82) {
   const positions = new Float32Array(count * 3);
@@ -106,6 +103,7 @@ function createOrbit(radius, opacity, rotation) {
   }
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
   const material = new THREE.LineBasicMaterial({
     color: 0x58f7ff,
     transparent: true,
@@ -164,34 +162,41 @@ function createIconTexture(text) {
 }
 
 function createMiniGlobe(data) {
-  const node = new THREE.Group();
+  const group = new THREE.Group();
 
   const pointSphere = createPointSphere(
     0.25,
-    190,
+    210,
     0.018,
-    0.92
+    0.95
   );
-  node.add(pointSphere);
+  group.add(pointSphere);
 
   const shell = new THREE.Mesh(
     new THREE.SphereGeometry(0.255, 24, 24),
     new THREE.MeshBasicMaterial({
       color: 0x20dcff,
       transparent: true,
-      opacity: 0.045,
+      opacity: 0.05,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     })
   );
-  node.add(shell);
+  group.add(shell);
 
-  const orbit = createOrbit(
+  const ringA = createOrbit(
     0.34,
-    0.45,
-    [1.1, 0.2, 0.15]
+    0.46,
+    [1.08, 0.2, 0.14]
   );
-  node.add(orbit);
+  group.add(ringA);
+
+  const ringB = createOrbit(
+    0.3,
+    0.24,
+    [0.38, 1.08, -0.24]
+  );
+  group.add(ringB);
 
   const icon = new THREE.Sprite(
     new THREE.SpriteMaterial({
@@ -201,15 +206,28 @@ function createMiniGlobe(data) {
       blending: THREE.AdditiveBlending
     })
   );
-  icon.scale.setScalar(0.42);
+  icon.scale.setScalar(0.43);
   icon.userData = data;
-  node.add(icon);
+  group.add(icon);
 
-  node.userData.pointSphere = pointSphere;
-  node.userData.orbit = orbit;
-  node.userData.icon = icon;
+  const hitArea = new THREE.Mesh(
+    new THREE.SphereGeometry(0.34, 16, 16),
+    new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      depthWrite: false
+    })
+  );
+  hitArea.userData = data;
+  group.add(hitArea);
 
-  return node;
+  group.userData.pointSphere = pointSphere;
+  group.userData.ringA = ringA;
+  group.userData.ringB = ringB;
+  group.userData.icon = icon;
+  group.userData.hitArea = hitArea;
+
+  return group;
 }
 
 function latLonToVector3(latitude, longitude, radius) {
@@ -225,10 +243,10 @@ function latLonToVector3(latitude, longitude, radius) {
 
 const mainPointGlobe = createPointSphere(
   GLOBE_RADIUS,
-  window.innerWidth < 700 ? 2600 : 4800,
-  window.innerWidth < 700 ? 0.028 : 0.022
+  window.innerWidth < 700 ? 2800 : 5200,
+  window.innerWidth < 700 ? 0.027 : 0.021
 );
-mainGlobe.add(mainPointGlobe);
+globeBody.add(mainPointGlobe);
 
 const mainGlow = new THREE.Mesh(
   new THREE.SphereGeometry(GLOBE_RADIUS * 1.02, 64, 64),
@@ -241,19 +259,43 @@ const mainGlow = new THREE.Mesh(
     depthWrite: false
   })
 );
-mainGlobe.add(mainGlow);
+globeBody.add(mainGlow);
 
 const mainOrbits = [
-  createOrbit(GLOBE_RADIUS * 1.15, 0.13, [1.1, 0.1, 0.15]),
-  createOrbit(GLOBE_RADIUS * 1.28, 0.11, [0.65, 1.0, -0.25]),
-  createOrbit(GLOBE_RADIUS * 1.4, 0.08, [1.45, 0.3, 0.4]),
-  createOrbit(GLOBE_RADIUS * 1.52, 0.06, [0.28, 0.9, -0.6])
+  createOrbit(GLOBE_RADIUS * 1.12, 0.14, [1.12, 0.05, 0.12]),
+  createOrbit(GLOBE_RADIUS * 1.24, 0.11, [0.62, 1.0, -0.24]),
+  createOrbit(GLOBE_RADIUS * 1.36, 0.09, [1.42, 0.28, 0.38]),
+  createOrbit(GLOBE_RADIUS * 1.48, 0.07, [0.28, 0.88, -0.58]),
+  createOrbit(GLOBE_RADIUS * 1.58, 0.05, [0.9, 1.35, 0.12])
 ];
 
-mainOrbits.forEach((orbit) => mainGlobe.add(orbit));
+mainOrbits.forEach((orbit) => globeBody.add(orbit));
 
 const nodes = [];
 const rayTargets = [];
+
+/*
+  Layout stabil berdasarkan ID.
+*/
+const UNIVERSE_LAYOUT = {
+  about:     new THREE.Vector3(0, 0, 0.18),
+  menu:      new THREE.Vector3(0, 1.55, 0.08),
+  emotion:   new THREE.Vector3(1.65, 0.7, 0.02),
+  chatbot:   new THREE.Vector3(-1.65, 0.7, 0.02),
+  onda:      new THREE.Vector3(1.55, -0.9, 0.02),
+  portfolio: new THREE.Vector3(-1.55, -0.9, 0.02),
+  contact:   new THREE.Vector3(0, -1.65, 0.08)
+};
+
+const DATA_SPACE_LAYOUT = {
+  menu:      new THREE.Vector3(-1.7, 1.12, 0.08),
+  about:     new THREE.Vector3(0, 1.12, 0.12),
+  contact:   new THREE.Vector3(1.7, 1.12, 0.08),
+  emotion:   new THREE.Vector3(-1.7, -0.25, 0.08),
+  chatbot:   new THREE.Vector3(0, -0.25, 0.12),
+  onda:      new THREE.Vector3(1.7, -0.25, 0.08),
+  portfolio: new THREE.Vector3(0, -1.58, 0.12)
+};
 
 NODE_DATA.forEach((data, index) => {
   const globePosition = latLonToVector3(
@@ -263,47 +305,28 @@ NODE_DATA.forEach((data, index) => {
   );
 
   const miniGlobe = createMiniGlobe(data);
-  miniGlobe.position.copy(globePosition);
   miniGlobe.scale.setScalar(data.importance || 1);
-  mainGlobe.add(miniGlobe);
-
-  const universeAngle =
-    (index / NODE_DATA.length) * Math.PI * 2;
-
-  const universeRadius =
-    1.3 + (index % 3) * 0.78;
-
-  const universePosition = new THREE.Vector3(
-    Math.cos(universeAngle) * universeRadius,
-    Math.sin(universeAngle) * universeRadius * 0.72,
-    Math.sin(universeAngle * 1.7) * 0.35
-  );
-
-  const dataColumns = 3;
-  const column = index % dataColumns;
-  const row = Math.floor(index / dataColumns);
-
-  const dataPosition = new THREE.Vector3(
-    (column - 1) * 1.65,
-    (0.8 - row) * 1.5,
-    0.15 + (index % 2) * 0.18
-  );
+  nodeLayer.add(miniGlobe);
 
   nodes.push({
     data,
     miniGlobe,
     globePosition,
-    universePosition,
-    dataPosition,
-    universeAngle,
-    universeRadius
+    universePosition:
+      (UNIVERSE_LAYOUT[data.id] || new THREE.Vector3()).clone(),
+    dataSpacePosition:
+      (DATA_SPACE_LAYOUT[data.id] || new THREE.Vector3()).clone()
   });
 
-  rayTargets.push(miniGlobe.userData.icon);
+  rayTargets.push(miniGlobe.userData.hitArea);
 });
 
-const starCount = window.innerWidth < 700 ? 750 : 1300;
-const stars = createPointSphere(24, starCount, 0.035, 0.55);
+const stars = createPointSphere(
+  24,
+  window.innerWidth < 700 ? 800 : 1400,
+  0.035,
+  0.55
+);
 scene.add(stars);
 
 let zoom = 1;
@@ -313,6 +336,8 @@ let rotationX = 0;
 let rotationY = 0;
 let targetRotationX = 0;
 let targetRotationY = 0;
+
+const globeQuaternion = new THREE.Quaternion();
 
 let dragging = false;
 let lastX = 0;
@@ -340,27 +365,31 @@ function smoothstep(edge0, edge1, value) {
 }
 
 function getModeWeights() {
-  const universe = 1 - smoothstep(0.45, 0.72, zoom);
+  const universe = 1 - smoothstep(0.5, 0.75, zoom);
   const dataSpace = smoothstep(1.22, 1.5, zoom);
-  const globe = THREE.MathUtils.clamp(
-    1 - universe - dataSpace,
-    0,
-    1
-  );
 
   return {
     universe,
-    globe,
+    globe: THREE.MathUtils.clamp(
+      1 - universe - dataSpace,
+      0,
+      1
+    ),
     dataSpace
   };
 }
 
 function updateModeUI(weights) {
   const percent = Math.round(zoom * 100);
+
   zoomText.textContent = `${percent}%`;
 
   zoomFill.style.width =
-    `${THREE.MathUtils.clamp((zoom - 0.35) / 1.25 * 100, 0, 100)}%`;
+    `${THREE.MathUtils.clamp(
+      (zoom - 0.35) / 1.25 * 100,
+      0,
+      100
+    )}%`;
 
   if (weights.universe > 0.55) {
     modeBadge.textContent = "Universe Mode";
@@ -370,13 +399,14 @@ function updateModeUI(weights) {
     modeBadge.textContent = "Globe Mode";
   }
 
-  const introOpacity =
-    weights.dataSpace > 0.3
-      ? THREE.MathUtils.lerp(1, 0.12, weights.dataSpace)
-      : 1;
-
   if (!infoPanel.classList.contains("open")) {
-    intro.style.opacity = String(introOpacity);
+    intro.style.opacity = String(
+      THREE.MathUtils.lerp(
+        1,
+        0.48,
+        weights.dataSpace
+      )
+    );
   }
 }
 
@@ -452,8 +482,8 @@ canvas.addEventListener("pointermove", (event) => {
 
   targetRotationX = THREE.MathUtils.clamp(
     targetRotationX,
-    -1.4,
-    1.4
+    -1.35,
+    1.35
   );
 
   lastX = event.clientX;
@@ -497,6 +527,7 @@ canvas.addEventListener(
     event.preventDefault();
 
     targetZoom -= event.deltaY * 0.0014;
+
     targetZoom = THREE.MathUtils.clamp(
       targetZoom,
       0.35,
@@ -579,6 +610,7 @@ zoomInButton.addEventListener("click", () => {
 
 function openInfo(data) {
   projectMenu.classList.remove("open");
+  projectMenu.setAttribute("aria-hidden", "true");
 
   infoKicker.textContent = data.kicker;
   infoTitle.textContent = data.title;
@@ -628,7 +660,8 @@ function closeInfo() {
 }
 
 function showMenu() {
-  infoPanel.classList.remove("open");
+  closeInfo();
+
   projectMenu.classList.add("open");
   projectMenu.setAttribute("aria-hidden", "false");
 }
@@ -642,26 +675,39 @@ function focusNode(id) {
     return;
   }
 
-  autoRotate = false;
-  resumeAutoRotateAt = performance.now() + 1100;
+  const weights = getModeWeights();
 
-  const targetDirection = camera.position
+  if (weights.globe < 0.55) {
+    openInfo(entry.data);
+    return;
+  }
+
+  autoRotate = false;
+  resumeAutoRotateAt = performance.now() + 1500;
+
+  const systemCenter = new THREE.Vector3();
+  systemRoot.getWorldPosition(systemCenter);
+
+  const cameraDirection = camera.position
     .clone()
-    .sub(world.position)
+    .sub(systemCenter)
     .normalize();
 
-  const localDirection =
-    entry.globePosition.clone().normalize();
+  const currentNodeDirection = entry.globePosition
+    .clone()
+    .applyQuaternion(globeQuaternion)
+    .normalize();
 
-  const startQuaternion =
-    world.quaternion.clone();
+  const deltaQuaternion =
+    new THREE.Quaternion().setFromUnitVectors(
+      currentNodeDirection,
+      cameraDirection
+    );
 
-  const endQuaternion =
-    new THREE.Quaternion()
-      .setFromUnitVectors(
-        localDirection,
-        targetDirection
-      );
+  const startQuaternion = globeQuaternion.clone();
+  const endQuaternion = deltaQuaternion
+    .multiply(startQuaternion)
+    .normalize();
 
   focusAnimation = {
     startQuaternion,
@@ -704,6 +750,7 @@ document
   .getElementById("closeMenu")
   .addEventListener("click", () => {
     projectMenu.classList.remove("open");
+    projectMenu.setAttribute("aria-hidden", "true");
   });
 
 document
@@ -713,11 +760,13 @@ document
 document
   .getElementById("resetButton")
   .addEventListener("click", () => {
+    targetZoom = 1;
     targetRotationX = 0;
     targetRotationY = 0;
-    targetZoom = 1;
 
     focusAnimation = null;
+    globeQuaternion.identity();
+
     autoRotate = true;
     resumeAutoRotateAt = 0;
 
@@ -726,10 +775,16 @@ document
   });
 
 function updateResponsivePosition() {
-  if (window.innerWidth <= 980) {
-    world.position.set(0, -0.55, 0);
+  const aspect = window.innerWidth / window.innerHeight;
+  const isPortrait = aspect < 0.82;
+  const isTablet = window.innerWidth <= 1100;
+
+  if (isPortrait) {
+    systemRoot.position.set(0, -0.48, 0);
+  } else if (isTablet) {
+    systemRoot.position.set(0.65, -0.3, 0);
   } else {
-    world.position.set(1.85, 0, 0);
+    systemRoot.position.set(1.85, 0, 0);
   }
 }
 
@@ -757,7 +812,7 @@ function animate(now) {
         ? 4 * progress ** 3
         : 1 - ((-2 * progress + 2) ** 3) / 2;
 
-    world.quaternion.slerpQuaternions(
+    globeQuaternion.slerpQuaternions(
       focusAnimation.startQuaternion,
       focusAnimation.endQuaternion,
       eased
@@ -765,23 +820,14 @@ function animate(now) {
 
     if (progress >= 1) {
       const data = focusAnimation.data;
-
       focusAnimation = null;
+
       resumeAutoRotateAt =
-        performance.now() + 900;
-
-      const euler =
-        new THREE.Euler().setFromQuaternion(
-          world.quaternion,
-          "XYZ"
-        );
-
-      rotationX = targetRotationX = euler.x;
-      rotationY = targetRotationY = euler.y;
+        performance.now() + 1000;
 
       window.setTimeout(() => {
         openInfo(data);
-      }, 130);
+      }, 140);
     }
   } else {
     if (
@@ -792,7 +838,7 @@ function animate(now) {
       autoRotate = true;
     }
 
-    if (autoRotate) {
+    if (autoRotate && weights.globe > 0.35) {
       targetRotationY += 0.00105;
     }
 
@@ -802,127 +848,135 @@ function animate(now) {
     rotationY +=
       (targetRotationY - rotationY) * 0.08;
 
-    world.rotation.set(
-      rotationX,
-      rotationY,
-      0
+    globeQuaternion.setFromEuler(
+      new THREE.Euler(
+        rotationX,
+        rotationY,
+        0,
+        "XYZ"
+      )
     );
   }
 
-  const visualScale =
-    THREE.MathUtils.lerp(
-      0.74,
-      1.18,
-      smoothstep(0.35, 1.6, zoom)
-    );
+  globeBody.quaternion.copy(globeQuaternion);
 
-  world.scale.setScalar(visualScale);
-
-  /*
-    Jangan menyembunyikan mainGlobe karena semua mini-globe node
-    merupakan anak dari group tersebut. Menyembunyikan induknya akan
-    membuat seluruh node hilang dan layar terlihat hitam.
-
-    Sebagai gantinya, hanya intensitas globe utama yang diredupkan.
-  */
-  mainGlobe.visible = true;
-
-  const globeBodyOpacity =
+  const bodyOpacity =
     0.82 *
     THREE.MathUtils.clamp(
-      1 - weights.universe * 0.78 - weights.dataSpace * 0.88,
-      0.08,
+      1 -
+        weights.universe * 0.82 -
+        weights.dataSpace * 0.9,
+      0.12,
       1
     );
 
-  mainPointGlobe.material.opacity = globeBodyOpacity;
-
+  mainPointGlobe.material.opacity = bodyOpacity;
   mainGlow.material.opacity =
     0.025 *
     THREE.MathUtils.clamp(
-      1 - weights.universe * 0.75 - weights.dataSpace * 0.9,
+      1 -
+        weights.universe * 0.8 -
+        weights.dataSpace * 0.92,
       0.05,
       1
     );
 
   mainOrbits.forEach((orbit, index) => {
     orbit.material.opacity =
-      (0.13 - index * 0.02) *
+      (0.14 - index * 0.02) *
       THREE.MathUtils.clamp(
-        1 - weights.dataSpace * 0.72,
-        0.2,
+        1 - weights.dataSpace * 0.75,
+        0.18,
         1
       );
+
+    orbit.rotation.z +=
+      0.00035 + index * 0.00009;
   });
 
   nodes.forEach((node, index) => {
-    const universeAngle =
-      node.universeAngle +
-      elapsed * (0.08 + index * 0.004);
+    const globePosition = node.globePosition
+      .clone()
+      .applyQuaternion(globeQuaternion);
 
-    const animatedUniversePosition =
+    const floatAmount =
+      node.data.id === "about"
+        ? 0.018
+        : 0.035;
+
+    const universeFloat =
       new THREE.Vector3(
-        Math.cos(universeAngle) *
-          node.universeRadius,
-        Math.sin(universeAngle) *
-          node.universeRadius * 0.72,
-        Math.sin(universeAngle * 1.7) * 0.35
+        Math.sin(elapsed * 0.42 + index) * floatAmount,
+        Math.cos(elapsed * 0.38 + index) * floatAmount,
+        Math.sin(elapsed * 0.31 + index) * 0.018
       );
 
-    const blendedPosition =
-      node.globePosition
-        .clone()
-        .lerp(
-          animatedUniversePosition,
-          weights.universe
-        )
-        .lerp(
-          node.dataPosition,
-          weights.dataSpace
-        );
+    const universePosition = node.universePosition
+      .clone()
+      .add(universeFloat);
 
-    node.miniGlobe.position.copy(
-      blendedPosition
-    );
+    const dataPosition = node.dataSpacePosition.clone();
 
-    node.miniGlobe.userData.pointSphere.rotation.y +=
-      0.008 + index * 0.0008;
+    const blended = globePosition
+      .clone()
+      .lerp(universePosition, weights.universe)
+      .lerp(dataPosition, weights.dataSpace);
 
-    node.miniGlobe.userData.orbit.rotation.z +=
-      0.006 + index * 0.0005;
+    node.miniGlobe.position.copy(blended);
 
-    /*
-      Universe mode:
-      mini-globe tetap terlihat dengan ukuran sedikit lebih besar.
+    const portraitFactor =
+      window.innerWidth / window.innerHeight < 0.82
+        ? 0.76
+        : 1;
 
-      Data Space mode:
-      mini-globe disusun rapi dan dibuat cukup besar agar mudah dibaca.
-    */
+    const universeBoost =
+      node.data.id === "about"
+        ? 0.34
+        : 0.12;
+
     const modeScale =
       1 +
-      weights.universe * 0.24 +
-      weights.dataSpace * 0.48;
+      weights.universe * universeBoost +
+      weights.dataSpace * 0.2;
 
     node.miniGlobe.scale.setScalar(
       (node.data.importance || 1) *
-      modeScale
+      modeScale *
+      portraitFactor
     );
 
-    /*
-      Mini-globe selalu menghadap kamera agar ikon di tengah tetap terbaca,
-      tetapi point sphere dan orbit internalnya tetap berotasi sendiri.
-    */
-    node.miniGlobe.quaternion.copy(
-      camera.quaternion
-    );
+    node.miniGlobe.userData.pointSphere.rotation.y +=
+      0.007 + index * 0.0007;
 
+    node.miniGlobe.userData.ringA.rotation.z +=
+      0.005 + index * 0.0004;
+
+    node.miniGlobe.userData.ringB.rotation.y -=
+      0.0035 + index * 0.0003;
+
+    node.miniGlobe.quaternion.copy(camera.quaternion);
     node.miniGlobe.visible = true;
   });
 
-  mainOrbits.forEach((orbit, index) => {
-    orbit.rotation.z +=
-      0.00035 + index * 0.0001;
-  });
+  const aspect = window.innerWidth / window.innerHeight;
+
+  const portraitBase =
+    aspect < 0.82
+      ? 0.7
+      : aspect < 1.15
+        ? 0.84
+        : 1;
+
+  const zoomScale =
+    THREE.MathUtils.lerp(
+      0.86,
+      1.06,
+      smoothstep(0.35, 1.6, zoom)
+    );
+
+  systemRoot.scale.setScalar(
+    portraitBase * zoomScale
+  );
 
   stars.rotation.y += 0.00005;
 
