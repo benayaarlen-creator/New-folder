@@ -1,11 +1,9 @@
 :root {
   --bg: #01070b;
   --cyan: #58f7ff;
-  --cyan-soft: rgba(88, 247, 255, 0.24);
   --white: #efffff;
   --muted: #8eb6c0;
   --panel: rgba(2, 15, 23, 0.94);
-  --line: rgba(88, 247, 255, 0.28);
 }
 
 * {
@@ -294,8 +292,8 @@ a {
 
 .panel-heading {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 20px;
 }
 
@@ -491,13 +489,61 @@ a {
   }
 
   .zoom-panel {
-    right: 12px;
-    bottom: 12px;
-    width: 150px;
+    right: 10px;
+    bottom: 10px;
+    width: 158px;
+    padding: 10px;
+  }
+
+  .zoom-controls {
+    grid-template-columns: 36px 1fr 36px;
+  }
+
+  .intro h1 {
+    font-size: clamp(2.25rem, 12vw, 4.4rem);
+  }
+
+  .mode-badge {
+    margin-top: 10px;
   }
 
   .info-panel {
-    max-height: 64svh;
+    width: calc(100% - 24px);
+    max-height: 54svh;
+    padding: 22px;
     overflow-y: auto;
+  }
+
+  .info-panel h2 {
+    font-size: clamp(1.55rem, 7vw, 2.5rem);
+  }
+
+  .info-panel p {
+    font-size: 0.86rem;
+  }
+}
+
+
+@media (orientation: portrait) and (min-width: 700px) {
+  .intro {
+    top: 108px;
+  }
+
+  .intro h1 {
+    font-size: clamp(3rem, 9vw, 5rem);
+  }
+
+  .intro p {
+    max-width: 620px;
+    margin-inline: auto;
+  }
+
+  .zoom-panel {
+    width: 180px;
+  }
+
+  .info-panel {
+    width: min(700px, calc(100% - 34px));
+    max-height: 48svh;
   }
 }
